@@ -1,0 +1,7 @@
+{% extends "accounts/base_auth.html" %}
+{% block title %}Request received{% endblock %}
+{% block body %}
+<h1>Request received</h1>
+<p class="sub">If the details are valid, we've emailed a verification link. Your account then waits for Super Admin approval — you'll be notified, and you can't sign in until it's approved.</p>
+<a class="btn btn-block" href="{% url 'accounts:login' %}">Back to sign in</a>
+{% endblock %}

@@ -1,0 +1,77 @@
+{% extends "dashboard/base.html" %}
+{% load dash %}
+{% block content %}
+<div class="page-head">
+  <div class="detail-hero" style="margin:0">
+    {% if hero_img %}<div class="detail-hero__img"><img src="{{ hero_img }}" alt="" onerror="this.style.display='none'"></div>{% else %}<div class="detail-hero__img">{% icon m.icon 34 %}</div>{% endif %}
+    <div>
+      <h1>{{ obj|truncatechars:70 }}</h1>
+      <p style="margin-top:8px">
+        <span class="pill-tag">{{ m.singular|capfirst }} · #{{ obj.pk }}</span>
+        {% if status_val %} <span class="badge {{ status_val|badge_class }}">{{ status_display }}</span>{% endif %}
+        {% if status_val == 'scheduled' and not live %} <span class="muted small">goes live {{ obj.publish_at|date:"d M Y, H:i" }}</span>{% endif %}
+      </p>
+    </div>
+  </div>
+  <div class="actions">
+    <a class="btn btn-ghost" href="{% url 'dashboard:list' m.slug %}">{% icon "back" 16 %} Back to {{ m.title|lower }}</a>
+    {% if preview_url %}<a class="btn" href="{{ preview_url }}" target="_blank" rel="noopener">{% icon "external" 16 %} {% if live %}View live{% else %}Preview{% endif %}</a>{% endif %}
+    {% if can_delete %}<a class="btn btn-danger" href="{% url 'dashboard:delete' m.slug obj.pk %}">{% icon "trash" 16 %} Delete</a>{% endif %}
+    {% if can_edit %}<a class="btn btn-primary" href="{% url 'dashboard:edit' m.slug obj.pk %}">{% icon "edit" 16 %} Edit</a>{% endif %}
+  </div>
+</div>
+
+<div class="detail-grid">
+  <div>
+    {% for sec in sections %}
+    <section class="card detail-section">
+      <div class="card__head"><h2>{{ sec.title }}</h2></div>
+      <dl class="detail-list">
+        {% for it in sec.items %}
+          <dt>{{ it.label }}</dt>
+          <dd>
+            {% if it.kind == 'bool' %}{% if it.value %}<span class="badge b-ok">Yes</span>{% else %}<span class="badge b-muted">No</span>{% endif %}
+            {% elif it.kind == 'badge' %}{% if it.display %}<span class="badge {{ it.value|badge_class }}">{{ it.display }}</span>{% else %}<span class="empty-val">Not set</span>{% endif %}
+            {% elif it.kind == 'image' %}{% if it.value %}<img class="preview" src="{{ it.value }}" alt="" onerror="this.style.display='none'"><div class="muted tiny mono" style="margin-top:6px">{{ it.value }}</div>{% else %}<span class="empty-val">Not set</span>{% endif %}
+            {% elif it.kind == 'color' %}{% if it.value %}<span class="swatch" style="background:{{ it.value }}"></span><span class="mono">{{ it.value }}</span>{% else %}<span class="empty-val">Not set</span>{% endif %}
+            {% elif it.kind == 'rich' %}{% if it.value %}<div class="prose">{{ it.value|safe }}</div>{% else %}<span class="empty-val">Not set</span>{% endif %}
+            {% elif it.kind == 'chips' %}{% if it.value %}<div class="chips">{% for c in it.value %}<span class="pill-tag">{{ c }}</span>{% endfor %}</div>{% else %}<span class="empty-val">None</span>{% endif %}
+            {% elif it.kind == 'table' %}<div class="table-wrap"><table class="t" style="min-width:0"><thead><tr>{% for k in it.value.keys %}<th>{{ k }}</th>{% endfor %}</tr></thead><tbody>{% for row in it.value.rows %}<tr>{% for c in row %}<td>{{ c }}</td>{% endfor %}</tr>{% endfor %}</tbody></table></div>
+            {% elif it.kind == 'json' %}{% if it.value %}<pre class="mono" style="margin:0;white-space:pre-wrap">{{ it.value }}</pre>{% else %}<span class="empty-val">Not set</span>{% endif %}
+            {% elif it.kind == 'datetime' %}{% if it.value %}{{ it.value|date:"d M Y, H:i" }}{% else %}<span class="empty-val">Not set</span>{% endif %}
+            {% elif it.kind == 'date' %}{% if it.value %}{{ it.value|date:"d M Y" }}{% else %}<span class="empty-val">Not set</span>{% endif %}
+            {% elif it.kind == 'url' %}{% if it.value %}<a href="{{ it.value }}" target="_blank" rel="noopener noreferrer">{{ it.value }}</a>{% else %}<span class="empty-val">Not set</span>{% endif %}
+            {% elif it.kind == 'long' %}{% if it.value %}<div style="white-space:pre-wrap">{{ it.value }}</div>{% else %}<span class="empty-val">Not set</span>{% endif %}
+            {% else %}{% if it.value == None or it.value == "" %}<span class="empty-val">Not set</span>{% else %}{{ it.value }}{% endif %}{% endif %}
+          </dd>
+        {% endfor %}
+      </dl>
+    </section>
+    {% empty %}
+    <section class="card"><div class="empty">{% icon "doc" 34 %}<h3>No details to show</h3><p>This record has no viewable fields.</p></div></section>
+    {% endfor %}
+  </div>
+
+  <aside class="stack">
+    <section class="card meta-card">
+      <div class="card__head"><h3>Record info</h3></div>
+      <dl>{% for k, v in meta %}<dt>{{ k }}</dt><dd>{% if v.year %}{{ v|date:"d M Y, H:i" }}{% else %}{{ v }}{% endif %}</dd>{% endfor %}</dl>
+    </section>
+    <section class="card">
+      <div class="card__head"><h3>Quick actions</h3></div>
+      <div class="stack-sm">
+        {% if can_edit %}<a class="rowlink" href="{% url 'dashboard:edit' m.slug obj.pk %}">{% icon "edit" 18 %}<span class="grow">Edit this {{ m.singular }}</span>{% icon "chevron" 16 %}</a>{% endif %}
+        {% if preview_url %}<a class="rowlink" href="{{ preview_url }}" target="_blank" rel="noopener">{% icon "external" 18 %}<span class="grow">{% if live %}Open on website{% else %}Preview draft{% endif %}</span>{% icon "chevron" 16 %}</a>{% endif %}
+        <a class="rowlink" href="{% url 'dashboard:list' m.slug %}">{% icon "layers" 18 %}<span class="grow">All {{ m.title|lower }}</span>{% icon "chevron" 16 %}</a>
+      </div>
+      {% if prev_next.total %}
+      <div class="inline-form" style="margin-top:16px;justify-content:space-between">
+        {% if prev_next.prev %}<a class="btn btn-sm" href="{% url 'dashboard:detail' m.slug prev_next.prev %}">{% icon "back" 14 %} Previous</a>{% else %}<span></span>{% endif %}
+        <span class="muted tiny">{{ prev_next.pos }} of {{ prev_next.total }}</span>
+        {% if prev_next.next %}<a class="btn btn-sm" href="{% url 'dashboard:detail' m.slug prev_next.next %}">Next {% icon "chevron" 14 %}</a>{% else %}<span></span>{% endif %}
+      </div>
+      {% endif %}
+    </section>
+  </aside>
+</div>
+{% endblock %}

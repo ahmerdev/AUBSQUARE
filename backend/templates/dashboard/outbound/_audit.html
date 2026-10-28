@@ -1,0 +1,32 @@
+{% load dash %}
+{% if audit %}
+<div class="audit">
+  <div class="audit__top">
+    <div class="audit__score {% if audit.reachable %}lvl-{{ audit.level }}{% endif %}"><b>{% if audit.reachable %}{{ audit.score }}{% else %}—{% endif %}</b><span>{% if audit.reachable %}opportunity score{% else %}not scored{% endif %}</span></div>
+    <div class="grow">
+      <div><a href="{{ audit.final_url|default:audit.url }}" target="_blank" rel="noopener noreferrer"><b>{{ audit.final_url|default:audit.url|truncatechars:60 }}</b></a>{% if audit.reachable %} <span class="badge {{ audit.level|badge_class }}">{{ audit.get_level_display }} opportunity</span>{% endif %}</div>
+      <div class="muted small">Checked {{ audit.created_at|date:"d M Y, H:i" }}{% if audit.reachable %} · answered in {{ audit.load_seconds|floatformat:1 }}s · HTTP {{ audit.status_code }}{% endif %}</div>
+      {% if not audit.reachable %}<div class="alert alert--warn" style="margin-top:8px">{% icon "info" 18 %}<div><b>The website could not be audited.</b> {{ audit.error }} No score or findings were made up. Try again later.</div></div>{% endif %}
+    </div>
+  </div>
+  {% if audit.reachable %}
+  <ul class="checks">
+    <li class="{% if audit.is_https and audit.ssl_ok %}ok{% else %}bad{% endif %}">Secure HTTPS</li>
+    <li class="{% if audit.has_viewport %}ok{% else %}bad{% endif %}">Mobile viewport</li>
+    <li class="{% if audit.title %}ok{% else %}bad{% endif %}">Page title</li>
+    <li class="{% if audit.meta_description %}ok{% else %}bad{% endif %}">Meta description</li>
+    <li class="{% if audit.h1 %}ok{% else %}bad{% endif %}">H1 heading</li>
+    <li class="{% if audit.has_whatsapp %}ok{% else %}bad{% endif %}">WhatsApp button</li>
+    <li class="{% if audit.has_form or audit.emails_found %}ok{% else %}bad{% endif %}">Contact form / email</li>
+    <li class="{% if audit.has_open_graph %}ok{% else %}warn{% endif %}">Social sharing tags</li>
+    <li class="{% if audit.has_schema %}ok{% else %}warn{% endif %}">Structured data</li>
+    <li class="{% if audit.broken_links %}bad{% else %}ok{% endif %}">Links ({{ audit.links_checked }} checked)</li>
+  </ul>
+  {% if audit.findings %}
+  <h4 style="margin:16px 0 8px">What we would fix</h4>
+  <ul class="list">{% for f in audit.findings %}<li><div class="grow"><b>{{ f.title }}</b><div class="muted small">{{ f.detail }}</div><div class="small">Service to offer: <b>{{ f.service }}</b></div></div><span class="badge b-brand">+{{ f.points }}</span></li>{% endfor %}</ul>
+  {% else %}<p class="muted">Nothing obvious to fix on the home page – a weak opportunity.</p>{% endif %}
+  {% if audit.images_missing_alt %}<p class="muted small">{{ audit.images_missing_alt }} of {{ audit.images_total }} images have no alt text.</p>{% endif %}
+  {% endif %}
+</div>
+{% endif %}

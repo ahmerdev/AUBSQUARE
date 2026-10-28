@@ -1,0 +1,57 @@
+{% extends "dashboard/base.html" %}
+{% load dash %}
+{% block content %}
+<style>
+.invrow{display:grid;grid-template-columns:2fr 2fr 70px 120px 70px 100px 40px;gap:8px;margin-bottom:8px;align-items:start}
+.invrow .amt{padding-top:11px;text-align:right;font-variant-numeric:tabular-nums}
+.editor{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(300px,1fr);gap:16px;align-items:start}
+.preview{position:sticky;top:90px}.preview .paper{background:#fff;color:#1b1830;border-radius:14px;padding:22px;font-size:12.5px;box-shadow:0 10px 30px -14px rgba(0,0,0,.5)}
+.preview .paper h3{margin:0 0 2px;font-size:20px;color:var(--pv,#EC008C)}.preview table{width:100%;border-collapse:collapse;margin-top:12px}.preview th{background:var(--pv,#EC008C);color:#fff;text-align:left;padding:6px;font-size:10.5px}.preview td{padding:6px;border-bottom:1px solid #eee;vertical-align:top}
+.preview .r{text-align:right}.preview .tot td{border:0;padding:3px 6px}.preview .grand td{font-weight:700;font-size:14px;border-top:2px solid var(--pv,#EC008C)}
+@media(max-width:1000px){.editor{grid-template-columns:1fr}.preview{position:static}.invrow{grid-template-columns:1fr 1fr}.invrow input[name=item_desc],.invrow input[name=item_detail]{grid-column:1/-1}}
+</style>
+<form method="post" novalidate data-warn-unsaved>{% csrf_token %}
+<div class="page-head"><div><h1>{% if inv %}Edit draft{% else %}New invoice{% endif %}</h1><p>{% if lead %}For lead {{ lead.reference }} – {{ lead.name }}. {% elif prospect %}For prospect {{ prospect.business_name }}. {% endif %}Saving a draft does <b>not</b> issue or send anything. You review and issue it on the next page.</p></div>
+  <div class="actions"><a class="btn" href="{% if inv %}{% url 'dashboard:invoice_detail' inv.pk %}{% else %}{% url 'dashboard:invoices' %}{% endif %}">Cancel</a><button class="btn btn-primary" type="submit">Save draft</button></div></div>
+{% if form.non_field_errors %}<div class="alert alert--bad" style="margin-bottom:16px">{{ form.non_field_errors }}</div>{% endif %}
+{% if form.errors and not form.non_field_errors %}<div class="alert alert--bad" style="margin-bottom:16px">Please fix the highlighted fields.</div>{% endif %}
+<div class="editor"><div class="stack">
+<section class="card"><div class="card__head"><h2>Client</h2></div><div class="fgrid">
+{% for f in form %}{% if f.name in 'client_name,client_company,client_email,client_phone,client_country,client_tax_label,client_tax_no' %}<div class="field {% if f.errors %}has-error{% endif %}"><label class="lbl" for="{{ f.id_for_label }}">{{ f.label }}</label>{{ f }}{{ f.errors }}</div>{% endif %}{% endfor %}
+<div class="field field--wide {% if form.client_address.errors %}has-error{% endif %}"><label class="lbl" for="{{ form.client_address.id_for_label }}">Billing address</label>{{ form.client_address }}{{ form.client_address.errors }}</div></div></section>
+<section class="card"><div class="card__head"><h2>Project & dates</h2></div><div class="fgrid">
+{% for f in form %}{% if f.name in 'project_name,currency,billing_type,milestone_label,issue_date,due_date' %}<div class="field {% if f.errors %}has-error{% endif %}"><label class="lbl" for="{{ f.id_for_label }}">{{ f.label }}</label>{{ f }}{{ f.errors }}{% if f.name == 'currency' %}<div class="help">Totals stay in this currency. Only currencies enabled in Company billing are offered.</div>{% endif %}</div>{% endif %}{% endfor %}
+<div class="field field--wide"><label class="lbl" for="{{ form.description.id_for_label }}">Invoice description</label>{{ form.description }}</div></div></section>
+<section class="card"><div class="card__head"><h2>Line items</h2><button class="btn btn-sm" type="button" id="additem">{% icon "plus" 14 %} Add line</button></div>
+<div class="muted small invrow" style="margin-bottom:4px"><span>Description</span><span>Details</span><span>Qty</span><span>Unit price</span><span>Unit</span><span style="text-align:right">Amount</span><span></span></div>
+<div id="items">{% for it in items %}<div class="invrow"><input class="input" name="item_desc" value="{{ it.description }}" placeholder="What you are billing for" required><input class="input" name="item_detail" value="{{ it.detail }}" placeholder="Details (optional)"><input class="input" name="item_qty" value="{{ it.quantity|floatformat:'-2' }}" type="number" step="0.01" min="0.01"><input class="input" name="item_price" value="{{ it.unit_price|floatformat:'2' }}" type="number" step="0.01" min="0"><input class="input" name="item_unit" value="{{ it.unit }}" placeholder="hrs"><div class="amt" data-amt>0.00</div><button class="btn btn-sm btn-danger" type="button" data-remove aria-label="Remove line">×</button></div>{% endfor %}</div>
+<template id="itemtpl"><div class="invrow"><input class="input" name="item_desc" placeholder="What you are billing for" required><input class="input" name="item_detail" placeholder="Details (optional)"><input class="input" name="item_qty" value="1" type="number" step="0.01" min="0.01"><input class="input" name="item_price" value="0.00" type="number" step="0.01" min="0"><input class="input" name="item_unit" placeholder="hrs"><div class="amt" data-amt>0.00</div><button class="btn btn-sm btn-danger" type="button" data-remove aria-label="Remove line">×</button></div></template>
+<div class="fgrid" style="margin-top:14px">{% for f in form %}{% if f.name in 'discount,tax_percent,tax_name' %}<div class="field {% if f.errors %}has-error{% endif %}"><label class="lbl" for="{{ f.id_for_label }}">{{ f.label }}</label>{{ f }}{{ f.errors }}{% if f.help_text %}<div class="help">{{ f.help_text }}</div>{% endif %}</div>{% endif %}{% endfor %}</div></section>
+<section class="card"><div class="card__head"><h2>Payment & notes</h2></div><div class="fgrid">
+<div class="field field--wide"><label class="lbl">{{ form.methods.label }}</label>{{ form.methods }}<div class="help">{{ form.methods.help_text }}</div></div>
+{% for f in form %}{% if f.name in 'terms,notes,footer' %}<div class="field field--wide"><label class="lbl" for="{{ f.id_for_label }}">{{ f.label }}</label>{{ f }}{{ f.errors }}</div>{% endif %}{% endfor %}</div></section>
+</div>
+<aside class="preview"><div class="card"><div class="card__head"><h2>Live preview</h2></div><div class="paper" id="pv" style="--pv:{{ co.brand_color }}">
+<h3>INVOICE</h3><div style="color:#6b6784">{{ co.name|default:"Your company" }}</div><hr style="border:0;border-top:1px solid #eee;margin:10px 0">
+<div><b id="pv-client">Client</b><div id="pv-company" style="color:#6b6784"></div></div><div style="color:#6b6784;margin-top:6px">Due <span id="pv-due">—</span> · <span id="pv-cur">USD</span></div>
+<table><thead><tr><th>Item</th><th class="r">Qty</th><th class="r">Amount</th></tr></thead><tbody id="pv-rows"></tbody></table>
+<table class="tot"><tr><td class="r">Subtotal</td><td class="r" id="pv-sub">0</td></tr><tr id="pv-dr" hidden><td class="r">Discount</td><td class="r" id="pv-disc">0</td></tr><tr id="pv-tr" hidden><td class="r"><span id="pv-tn">Tax</span></td><td class="r" id="pv-tax">0</td></tr><tr class="grand"><td class="r">Total</td><td class="r" id="pv-total">0</td></tr></table></div>
+<p class="muted small" style="margin-top:10px">Preview only. The final amounts are calculated again on the server when you save, and again when the invoice is issued.</p></div></aside></div>
+</form>
+{{ currencies|json_script:"cur-dec" }}
+<script>(function(){
+var DEC=JSON.parse(document.getElementById("cur-dec").textContent),box=document.getElementById("items"),tpl=document.getElementById("itemtpl");
+function $(s){return document.querySelector(s);} function val(n){var e=document.querySelector("[name="+n+"]");return e?e.value:"";}
+function dec(){var c=val("currency");return (c in DEC)?DEC[c]:2;}
+function r(x){var d=dec(),m=Math.pow(10,d);return Math.round((x+Number.EPSILON*Math.sign(x))*m)/m;}
+function f(x){return r(x).toLocaleString(undefined,{minimumFractionDigits:dec(),maximumFractionDigits:dec()});}
+function esc(t){var d=document.createElement("div");d.textContent=t;return d.innerHTML;}
+function calc(){var sub=0,rows="";box.querySelectorAll(".invrow").forEach(function(row){var q=parseFloat(row.querySelector("[name=item_qty]").value)||0,p=parseFloat(row.querySelector("[name=item_price]").value)||0,a=r(q*p),d=row.querySelector("[name=item_desc]").value;row.querySelector("[data-amt]").textContent=f(a);sub+=a;if(d)rows+="<tr><td>"+esc(d)+"</td><td class='r'>"+q+"</td><td class='r'>"+f(a)+"</td></tr>";});
+var disc=Math.min(Math.max(parseFloat(val("discount"))||0,0),sub),tp=Math.min(Math.max(parseFloat(val("tax_percent"))||0,0),100),tax=r((sub-disc)*tp/100),tot=r(sub-disc+tax);
+$("#pv-rows").innerHTML=rows||"<tr><td colspan='3' style='color:#aaa'>Add a line item</td></tr>";$("#pv-sub").textContent=f(sub);$("#pv-dr").hidden=!disc;$("#pv-disc").textContent="-"+f(disc);$("#pv-tr").hidden=!tp;$("#pv-tn").textContent=(val("tax_name")||"Tax")+" ("+tp+"%)";$("#pv-tax").textContent=f(tax);$("#pv-total").textContent=val("currency")+" "+f(tot);
+$("#pv-client").textContent=val("client_name")||"Client";$("#pv-company").textContent=val("client_company");$("#pv-due").textContent=val("due_date")||"—";$("#pv-cur").textContent=val("currency");}
+document.getElementById("additem").addEventListener("click",function(){box.appendChild(tpl.content.cloneNode(true));calc();});
+box.addEventListener("click",function(e){var b=e.target.closest("[data-remove]");if(b){b.closest(".invrow").remove();calc();}});
+document.querySelector("form").addEventListener("input",calc);document.querySelector("form").addEventListener("change",calc);
+if(!box.children.length)box.appendChild(tpl.content.cloneNode(true));calc();})();</script>
+{% endblock %}

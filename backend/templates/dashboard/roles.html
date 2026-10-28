@@ -1,0 +1,10 @@
+{% extends "dashboard/base.html" %}
+{% load dash %}
+{% block content %}
+<div class="page-head"><div><h1>Roles &amp; permissions</h1><p>Each role grants actions (view, create, edit, publish, delete, export, approve, manage settings) per section.</p></div>
+  <div class="actions"><a class="btn" href="{% url 'dashboard:users' %}">← Users</a>{% if is_super %}<a class="btn btn-primary" href="{% url 'dashboard:role_create' %}">{% icon "plus" 16 %} New role</a>{% endif %}</div></div>
+<div class="grid g3">{% for r in roles %}
+  <div class="card tilt"><div class="card__head"><h2>{{ r.name }}</h2>{% if r.is_system %}<span class="badge b-muted">Built-in</span>{% endif %}</div><p class="muted small" style="min-height:40px">{{ r.description }}</p>
+    <div class="stat__foot"><span>{{ r.user_count }} user{{ r.user_count|pluralize }}</span><span>·</span><span>{{ r.module_count }} section{{ r.module_count|pluralize }}</span></div>
+    <div class="actions" style="margin-top:14px"><a class="btn btn-sm" href="{% url 'dashboard:role_edit' r.pk %}">{% if is_super %}Edit permissions{% else %}View{% endif %}</a></div></div>{% endfor %}</div>
+{% endblock %}

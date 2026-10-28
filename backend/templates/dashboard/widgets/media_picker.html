@@ -1,0 +1,10 @@
+<div class="media-picker" data-kind="{{ widget.kind }}">
+  <div class="media-picker__preview">{% if widget.value %}<img src="{{ widget.value }}" alt="" onerror="this.style.display='none'">{% endif %}</div>
+  <div class="media-picker__body">
+    <input type="text" name="{{ widget.name }}" value="{{ widget.value|default_if_none:'' }}" class="input" placeholder="Paste a URL or choose from the library"{% include "django/forms/widgets/attrs.html" %}>
+    <div class="media-picker__actions">
+      <button type="button" class="btn btn-sm btn-ghost" data-media-open>Choose from library</button>
+      <button type="button" class="btn btn-sm btn-ghost" data-media-clear>Clear</button>
+    </div>
+  </div>
+</div>

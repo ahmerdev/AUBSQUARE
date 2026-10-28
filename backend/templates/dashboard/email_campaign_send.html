@@ -1,0 +1,20 @@
+{% extends "dashboard/base.html" %}
+{% load dash %}
+{% block content %}
+<div class="page-head"><div><h1>{{ ec.name }}</h1><p>Subject: <b>{{ ec.subject }}</b> · <span class="badge {{ ec.status|badge_class }}">{{ ec.get_status_display }}</span></p></div><div class="actions"><a class="btn" href="{% url 'dashboard:edit' 'email-campaigns' ec.pk %}">Edit</a><a class="btn" href="{% url 'dashboard:list' 'email-campaigns' %}">← Back</a></div></div>
+<div class="grid g-form">
+  <section class="card"><div class="card__head"><h2>Preview</h2></div><iframe title="Email preview" sandbox srcdoc="{{ preview_html }}" style="width:100%;height:520px;border:1px solid var(--line);border-radius:12px;background:#fff"></iframe></section>
+  <aside class="stack">
+    <section class="card"><div class="card__head"><h3>Audience</h3></div><div class="stat__value">{{ audience }}</div><p class="muted small">subscribed contacts with recorded consent. Unsubscribed, bounced and suppressed addresses are excluded automatically. Every email includes an unsubscribe link.</p></section>
+    {% if not smtp_ready %}<div class="alert alert--warn">{% icon "mail" 18 %}<div>Email sending isn't configured. <a href="{% url 'dashboard:email_settings' %}">Set it up</a> first.</div></div>{% endif %}
+    {% if can_send %}
+    <section class="card"><div class="card__head"><h3>Send</h3></div>
+      <form method="post" class="stack-sm">{% csrf_token %}<button class="btn btn-block" name="action" value="test" {% if not smtp_ready %}disabled{% endif %}>Send a test to me</button></form>
+      {% if ec.status == 'sent' or ec.status == 'sending' %}<p class="muted small" style="margin-top:12px">This campaign was already sent{% if ec.sent_at %} on {{ ec.sent_at|date:"d M Y H:i" }}{% endif %} to {{ ec.recipient_count }} recipients.</p>
+      {% else %}<form method="post" class="stack-sm" style="margin-top:14px">{% csrf_token %}<input type="hidden" name="action" value="send"><input type="hidden" name="count" value="{{ audience }}">
+        <label class="field field--check"><input type="checkbox" name="confirm" value="yes" required> <span>I confirm this goes to <b>{{ audience }}</b> people who opted in.</span></label>
+        <button class="btn btn-primary btn-block" {% if not smtp_ready or not audience %}disabled{% endif %} data-confirm="Send this campaign to {{ audience }} subscribers now? This can't be undone." data-confirm-title="Send campaign">{% icon "send" 16 %} Send to {{ audience }} subscribers</button></form>{% endif %}
+    </section>{% else %}<p class="muted small">You don't have permission to send campaigns.</p>{% endif %}
+  </aside>
+</div>
+{% endblock %}

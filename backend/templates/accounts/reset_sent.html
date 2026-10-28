@@ -1,0 +1,6 @@
+{% extends "accounts/base_auth.html" %}
+{% block title %}Check your email{% endblock %}
+{% block body %}
+<h1>Check your email</h1><p class="sub">If an active account exists for that address, a reset link is on its way. The link works once and expires in one hour.</p>
+<a class="btn btn-block" href="{% url 'accounts:login' %}">Back to sign in</a>
+{% endblock %}

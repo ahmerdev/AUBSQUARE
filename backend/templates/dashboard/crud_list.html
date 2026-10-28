@@ -1,0 +1,72 @@
+{% extends "dashboard/base.html" %}
+{% load dash %}
+{% block content %}
+<div class="page-head">
+  <div><h1>{{ m.title }}</h1>{% if m.help %}<p>{{ m.help }}</p>{% endif %}</div>
+  <div class="actions">
+    {% if can_export %}<a class="btn" href="{% url 'dashboard:export' m.slug %}?{{ qs }}">{% icon "download" 16 %} Export CSV</a>{% endif %}
+    {% if m.slug == 'subscribers' and can_create %}<a class="btn" href="{% url 'dashboard:subscribers_import' %}">{% icon "upload" 16 %} Import</a>{% endif %}
+    {% if can_create %}<a class="btn btn-primary" href="{% url 'dashboard:create' m.slug %}">{% icon "plus" 16 %} New {{ m.singular }}</a>{% endif %}
+  </div>
+</div>
+<div class="card card--flush">
+  <form class="toolbar" method="get">
+    {% if m.search %}<div class="grow"><input class="input" type="search" name="q" value="{{ q }}" placeholder="Search {{ m.title|lower }}…" aria-label="Search"></div>{% endif %}
+    <div class="filters">
+      {% for f in filters %}<select class="input" name="{{ f.name }}" aria-label="{{ f.label }}" onchange="this.form.submit()"><option value="">All {{ f.label|lower }}</option>{% for v, lbl in f.options %}<option value="{{ v }}" {% if f.current == v %}selected{% endif %}>{{ lbl }}</option>{% endfor %}</select>{% endfor %}
+    </div>
+    {% if m.search %}<button class="btn btn-sm" type="submit">Search</button>{% endif %}
+    {% if has_filters %}<a class="btn btn-sm btn-ghost" href="{% url 'dashboard:list' m.slug %}">Clear</a>{% endif %}
+  </form>
+  {% if bulk %}
+  <form method="post" action="{% url 'dashboard:bulk' m.slug %}" class="bulkbar" id="bulkbar">{% csrf_token %}
+    <span><b id="bulk-count">0</b> selected</span><span id="bulk-ids"></span><input type="hidden" name="next" value="{{ request.get_full_path }}">
+    {% for key, label, perm in bulk %}<button class="btn btn-sm {% if key == 'delete' %}btn-danger{% endif %}" name="action" value="{{ key }}" type="submit" {% if key == 'delete' %}data-confirm="Delete the selected {{ m.title|lower }}? This can't be undone." data-confirm-title="Delete selected"{% endif %}>{{ label }}</button>{% endfor %}
+    {% if can_export %}<a class="btn btn-sm btn-ghost" id="bulk-export" data-base="{% url 'dashboard:export' m.slug %}?{{ qs }}" href="#">Export selected</a>{% endif %}
+  </form>
+  {% endif %}
+  {% if rows %}
+  <div class="table-wrap">
+    <table class="t table--stack">
+      <thead><tr>
+        {% if bulk %}<th style="width:44px"><input class="check" type="checkbox" id="check-all" aria-label="Select all"></th>{% endif %}
+        {% for attr, label, kind in columns %}<th>{% if label %}{{ label }}{% endif %}</th>{% endfor %}
+        <th></th>
+      </tr></thead>
+      <tbody>
+      {% for r in rows %}
+        <tr>
+          {% if bulk %}<td class="nolabel"><input class="check js-row-check" type="checkbox" value="{{ r.pk }}" aria-label="Select row"></td>{% endif %}
+          {% for c in r.cells %}
+            <td data-label="{% for a, l, k in columns %}{% if a == c.attr %}{{ l }}{% endif %}{% endfor %}" class="{% if c.kind == 'title' %}title{% endif %} {% if c.kind == 'image' %}nolabel{% endif %}">
+              {% if c.kind == 'title' %}<a href="{{ r.detail_url }}">{{ c.display|default:"(untitled)" }}</a>
+              {% elif c.kind == 'image' %}{% if c.value %}<img class="thumb" src="{{ c.value }}" alt="" loading="lazy" onerror="this.style.visibility='hidden'">{% else %}<span class="thumb"></span>{% endif %}
+              {% elif c.kind == 'status' or c.kind == 'badge' %}<span class="badge {{ c.value|badge_class }}">{{ c.display }}</span>
+              {% elif c.kind == 'bool' %}{% if c.value %}<span class="badge b-ok">Yes</span>{% else %}<span class="muted">—</span>{% endif %}
+              {% elif c.kind == 'date' %}{% if c.value %}{{ c.value|date:"d M Y" }}{% else %}<span class="muted">—</span>{% endif %}
+              {% elif c.kind == 'num' %}{{ c.display }}
+              {% else %}<span class="ellipsis" style="max-width:340px;display:inline-block;vertical-align:bottom">{{ c.display|default_if_none:""|default:"—" }}</span>{% endif %}
+            </td>
+          {% endfor %}
+          <td class="nolabel"><div class="row-actions">
+            <a class="btn btn-sm btn-ghost" href="{{ r.detail_url }}" title="View details">{% icon "eye" 15 %} View</a>
+            {% if r.view_url %}<a class="btn btn-icon btn-sm" href="{{ r.view_url }}" target="_blank" rel="noopener" title="View on website" aria-label="View on website">{% icon "external" 14 %}</a>{% endif %}
+            {% if can_edit %}<a class="btn btn-sm" href="{{ r.edit_url }}">{% icon "edit" 14 %} Edit</a>{% endif %}
+            {% if can_delete %}<a class="btn btn-sm btn-danger" href="{% url 'dashboard:delete' m.slug r.pk %}" title="Delete">{% icon "trash" 14 %}</a>{% endif %}
+          </div></td>
+        </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% include "dashboard/_pagination.html" %}
+  {% else %}
+  <div class="empty">
+    {% icon "doc" 36 %}
+    <h3>{% if has_filters %}Nothing matches your search{% else %}No {{ m.title|lower }} yet{% endif %}</h3>
+    <p>{% if has_filters %}Try different keywords or clear the filters.{% else %}{% if can_create %}Create your first {{ m.singular }} to get started.{% else %}Items will appear here once they exist.{% endif %}{% endif %}</p>
+    {% if can_create and not has_filters %}<a class="btn btn-primary" href="{% url 'dashboard:create' m.slug %}">{% icon "plus" 16 %} New {{ m.singular }}</a>{% endif %}
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

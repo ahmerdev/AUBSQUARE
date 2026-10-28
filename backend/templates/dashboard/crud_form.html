@@ -1,0 +1,76 @@
+{% extends "dashboard/base.html" %}
+{% load dash %}
+{% block content %}
+<form method="post" data-warn-unsaved novalidate>{% csrf_token %}
+<div class="page-head">
+  <div><h1>{% if creating %}New {{ m.singular }}{% elif m.singleton %}{{ m.title }}{% else %}{{ obj|truncatechars:60 }}{% endif %}</h1>
+    {% if m.help %}<p>{{ m.help }}</p>{% endif %}
+    {% if not creating and m.status_field %}<p style="margin-top:8px"><span class="badge {{ obj.status|badge_class }}">{{ obj.get_status_display }}</span> {% if obj.status == 'scheduled' and not live %}<span class="muted small">goes live {{ obj.publish_at|date:"d M Y, H:i" }}</span>{% endif %}</p>{% endif %}</div>
+  <div class="actions">
+    {% if not creating and not m.singleton %}<a class="btn" href="{% url 'dashboard:detail' m.slug obj.pk %}">{% icon "eye" 16 %} View details</a>{% endif %}
+    {% if preview_url %}<a class="btn" href="{{ preview_url }}" target="_blank" rel="noopener">{% icon "external" 16 %} {% if live %}View live{% else %}Preview draft{% endif %}</a>{% endif %}
+    {% if can_delete %}<a class="btn btn-danger" href="{% url 'dashboard:delete' m.slug obj.pk %}">{% icon "trash" 16 %} Delete</a>{% endif %}
+  </div>
+</div>
+{% if form.non_field_errors %}<div class="alert alert--bad" style="margin-bottom:16px" role="alert">{{ form.non_field_errors }}</div>{% endif %}
+{% if not creating and m.status_field and not live and preview_url %}<div class="alert alert--info" style="margin-bottom:16px">{% icon "eye" 18 %}<div>This {{ m.singular }} isn't public yet. “Preview draft” opens a private, time-limited link that only works with its secret token and is hidden from search engines.</div></div>{% endif %}
+
+<div class="fl">
+<div class="fl__main">
+{% if fieldsets|length > 1 %}<nav class="jumpbar" aria-label="Sections on this page">{% for title, fields in fieldsets %}<a href="#fs-{{ title|slugify }}">{{ title }}</a>{% endfor %}</nav>{% endif %}
+{% for title, fields in fieldsets %}
+<section id="fs-{{ title|slugify }}" class="card fieldset fsec{% for f in fields %}{% if f.errors %} has-errors{% endif %}{% endfor %}">
+  <header class="fsec__head">
+    <span class="fsec__num">{{ forloop.counter }}</span>
+    <div class="fsec__title"><h2>{{ title }}</h2><span>{{ fields|length }} field{{ fields|length|pluralize }}</span></div>
+    <span class="chev">{% icon "down" 18 %}</span>
+  </header>
+  <div class="body">
+    {% if title == "SEO & social sharing" and seo_base %}<div class="serp" id="serp" data-base="{{ seo_base }}" style="margin-bottom:18px"><div class="u"></div><div class="t"></div><div class="d"></div></div>{% endif %}
+    <div class="fgrid">
+    {% for f in fields %}
+      <div class="field {% if f.errors %}has-error{% endif %} {% if f|is_checkbox %}field--check{% endif %} {% if f|is_wide %}field--wide{% endif %}">
+        {% if f|is_checkbox %}
+          {{ f }}<div class="field__text"><label for="{{ f.id_for_label }}">{{ f.label }}</label>{% if f.help_text %}<div class="help">{{ f.help_text }}</div>{% endif %}{{ f.errors }}</div>
+        {% else %}
+          <label class="lbl" for="{{ f.id_for_label }}">{{ f.label }}{% if f.field.required %} <span class="req" title="Required">*</span>{% endif %}</label>
+          {{ f }}
+          {% if f.help_text %}<div class="help">{{ f.help_text }}</div>{% endif %}{{ f.errors }}
+        {% endif %}
+      </div>
+    {% endfor %}
+    </div>
+  </div>
+</section>
+{% endfor %}
+
+{% if m.slug == 'email-campaigns' and not creating %}
+<div class="alert alert--info" >{% icon "mail" 18 %}<div>Ready to send? <a href="{% url 'dashboard:email_campaign_send' obj.pk %}"><b>Review and send →</b></a> Only subscribers who consented are included, and every message carries an unsubscribe link.</div></div>
+{% endif %}
+
+</div>
+
+<aside class="fl__side" aria-label="Save and sections">
+  <div class="card fl__panel">
+    <div class="fl__state"><span class="fl__dirty" aria-live="polite"><i></i><b class="state-dirty">Unsaved changes</b><b class="state-clean">{% if creating %}New {{ m.singular }}{% else %}All changes saved{% endif %}</b></span></div>
+    <button class="btn btn-primary btn-block" type="submit">{% icon "check" 16 %} {% if creating %}Create{% else %}Save changes{% endif %}</button>
+    {% if not m.singleton %}<button class="btn btn-soft btn-block" type="submit" name="_continue" value="1" data-keep>Save &amp; keep editing</button>{% endif %}
+    {% if not m.singleton %}<a class="btn btn-ghost btn-block" href="{% url 'dashboard:list' m.slug %}">Cancel</a>{% endif %}
+    {% if not creating and obj.updated_at %}<p class="fl__saved">Last saved {{ obj.updated_at|timesince }} ago</p>{% endif %}
+  </div>
+  {% if fieldsets|length > 1 %}
+  <nav class="card fl__toc" aria-label="On this page"><h3>On this page</h3>
+    {% for title, fields in fieldsets %}<a href="#fs-{{ title|slugify }}" data-spy="fs-{{ title|slugify }}"><i>{{ forloop.counter }}</i><span>{{ title }}</span></a>{% endfor %}
+  </nav>
+  {% endif %}
+</aside>
+</div>
+
+<div class="sticky-save fl__mobile">
+  <button class="btn btn-primary" type="submit">{% icon "check" 16 %} {% if creating %}Create{% else %}Save changes{% endif %}</button>
+  {% if not m.singleton %}<button class="btn" type="submit" name="_continue" value="1" data-keep>Save &amp; keep editing</button>{% endif %}
+  {% if not m.singleton %}<a class="btn btn-ghost" href="{% url 'dashboard:list' m.slug %}">Cancel</a>{% endif %}
+  <span class="fl__dirty fl__dirty--inline"><i></i><b class="state-dirty">Unsaved</b></span>
+</div>
+</form>
+{% endblock %}

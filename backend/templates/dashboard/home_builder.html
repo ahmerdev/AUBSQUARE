@@ -1,0 +1,30 @@
+{% extends "dashboard/base.html" %}
+{% load dash %}
+{% block content %}
+<form method="post" data-warn-unsaved novalidate>{% csrf_token %}
+<div class="page-head"><div><h1>Home page builder</h1><p>Reorder sections by dragging (or with the arrows), hide what you don't need, and edit each section's text. The hero always stays first.</p></div>
+  <div class="actions"><a class="btn" href="/" target="_blank" rel="noopener">{% icon "external" 16 %} View home page</a></div></div>
+{% if not can_edit %}<div class="alert alert--info" style="margin-bottom:14px">You have view-only access to this page.</div>{% endif %}
+<div id="builder">
+{% for it in items %}
+<section class="builder-item {% if not it.visible %}hidden-section{% endif %}" {% if it.spec.fixed_first %}data-fixed="1"{% endif %}>
+  <input type="hidden" name="order" value="{{ it.sec.key }}">
+  <div class="builder-head">
+    <span class="handle" title="{% if it.spec.fixed_first %}Fixed at the top{% else %}Drag to reorder{% endif %}">{% icon "drag" 18 %}</span>
+    <div style="flex:1;min-width:0"><b>{{ it.spec.label }}</b> <span class="muted small">· {{ it.sec.key }}</span></div>
+    {% if not it.spec.fixed_first %}<span class="mv"><button type="button" class="btn btn-sm btn-ghost mv-up" aria-label="Move up">{% icon "up" 14 %}</button><button type="button" class="btn btn-sm btn-ghost mv-down" aria-label="Move down">{% icon "down" 14 %}</button></span>
+    <label class="switch" title="Show on website"><input type="checkbox" name="visible-{{ it.sec.key }}" {% if it.visible %}checked{% endif %} {% if not can_edit %}disabled{% endif %}><span></span></label>{% else %}<span class="badge b-muted">Always visible</span>{% endif %}
+    <span>{% icon "down" 18 %}</span>
+  </div>
+  <div class="builder-body">
+    {% for f in it.form %}
+      <div class="field {% if f.errors %}has-error{% endif %}"><label class="lbl" for="{{ f.id_for_label }}">{{ f.label }}</label>{{ f }}{% if f.help_text %}<div class="help">{{ f.help_text }}</div>{% endif %}{{ f.errors }}</div>
+    {% endfor %}
+    {% if can_edit %}<button class="btn btn-sm btn-ghost" type="submit" name="reset" value="{{ it.sec.key }}" data-keep data-confirm="Restore “{{ it.spec.label }}” to its original text? Your edits to this section will be lost." data-confirm-title="Restore defaults">Restore default text</button>{% endif %}
+  </div>
+</section>
+{% endfor %}
+</div>
+{% if can_edit %}<div class="sticky-save"><button class="btn btn-primary" type="submit">{% icon "check" 16 %} Save home page</button><span class="muted small">Changes go live on the website right after saving.</span></div>{% endif %}
+</form>
+{% endblock %}

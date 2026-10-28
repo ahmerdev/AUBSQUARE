@@ -1,0 +1,15 @@
+{% extends "accounts/base_auth.html" %}
+{% block title %}Request access{% endblock %}
+{% block body %}
+<h1>Request staff access</h1><p class="sub">New accounts must be approved by a Super Admin before they can sign in.</p>
+<form method="post" novalidate>{% csrf_token %}
+  {% if form.non_field_errors %}<div class="alert alert--bad" style="margin-bottom:14px">{{ form.non_field_errors.0 }}</div>{% endif %}
+  {% include "accounts/_field.html" with field=form.full_name %}
+  {% include "accounts/_field.html" with field=form.email %}
+  {% include "accounts/_field.html" with field=form.password1 %}
+  {% include "accounts/_field.html" with field=form.password2 %}
+  <div class="hp" aria-hidden="true">{{ form.website }}</div>
+  <button class="btn btn-primary btn-block" type="submit">Request access</button>
+</form>
+<div class="auth-foot"><a href="{% url 'accounts:login' %}">← Back to sign in</a></div>
+{% endblock %}

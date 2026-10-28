@@ -1,0 +1,20 @@
+{% extends "dashboard/base.html" %}
+{% load dash %}
+{% block content %}
+<div class="page-head"><div><h1>Chatbot &amp; live chat</h1><p>Website visitors chat with the rule-based assistant and can ask for a human. Reply here in real time.</p></div>
+  <div class="actions"><a class="btn" href="{% url 'dashboard:list' 'knowledge' %}">{% icon "book" 16 %} Knowledge base</a><a class="btn" href="{% url 'dashboard:edit' 'chatbot-settings' 1 %}">{% icon "cog" 16 %} Chatbot settings</a></div></div>
+<div class="tabs" style="margin-bottom:14px"><a href="?status=open" class="{% if status == 'open' %}active{% endif %}">Needs attention <span class="n">{{ counts.open }}</span></a>{% for k, l in statuses %}<a href="?status={{ k }}" class="{% if status == k %}active{% endif %}">{{ l }} <span class="n">{{ counts|get_item:k }}</span></a>{% endfor %}<a href="?status=all" class="{% if status == 'all' %}active{% endif %}">All</a></div>
+<div class="card card--flush">
+  <form class="toolbar" method="get"><input type="hidden" name="status" value="{{ status }}"><div class="grow"><input class="input" type="search" name="q" value="{{ q }}" placeholder="Search visitor name, email or message…"></div><button class="btn btn-sm" type="submit">Search</button></form>
+  {% if page.object_list %}<div class="table-wrap"><table class="t table--stack"><thead><tr><th>Visitor</th><th>Last message</th><th>Status</th><th>Agent</th><th>Updated</th><th></th></tr></thead><tbody>
+  {% for c in page.object_list %}<tr>
+    <td class="title" data-label="Visitor"><a href="{% url 'dashboard:chat_detail' c.pk %}">{{ c.visitor_name|default:"Anonymous visitor" }}</a>{% if c.unread_for_agent %} <span class="badge b-brand">{{ c.unread_for_agent }} new</span>{% endif %}<div class="muted small">{{ c.visitor_email|default:"No email yet" }}</div></td>
+    <td data-label="Last message"><span class="ellipsis" style="max-width:320px;display:inline-block">{{ c.last_message_preview }}</span></td>
+    <td data-label="Status"><span class="badge {{ c.status|badge_class }}">{{ c.get_status_display }}</span></td>
+    <td data-label="Agent">{{ c.assigned_to.display_name|default:"—" }}</td>
+    <td data-label="Updated" class="nowrap">{{ c.last_message_at|timesince }} ago</td>
+    <td class="nolabel"><div class="row-actions"><a class="btn btn-sm" href="{% url 'dashboard:chat_detail' c.pk %}">Open</a></div></td></tr>{% endfor %}</tbody></table></div>
+  {% include "dashboard/_pagination.html" %}
+  {% else %}<div class="empty">{% icon "chat" 36 %}<h3>No conversations here</h3><p>When visitors use the chat widget, their conversations are saved and listed here.</p></div>{% endif %}
+</div>
+{% endblock %}

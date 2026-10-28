@@ -1,0 +1,23 @@
+{% extends "dashboard/base.html" %}
+{% load dash %}
+{% block content %}
+<div class="page-head"><div><h1>Ads manager</h1><p>Plan and approve ad campaigns, groups and creatives. This is a planning workspace — nothing here is published to Google or Meta.</p></div>
+  <div class="actions"><a class="btn" href="{% url 'dashboard:list' 'campaigns' %}">All campaigns</a>{% if can_create %}<a class="btn" href="{% url 'dashboard:create' 'ad-groups' %}">New ad group</a><a class="btn btn-primary" href="{% url 'dashboard:create' 'ad-creatives' %}">{% icon "plus" 16 %} New creative</a>{% endif %}</div></div>
+<div class="grid g2" style="margin-bottom:16px">
+  {% for i in integrations %}<section class="card"><div class="card__head"><h3>{{ i.label }}</h3><span class="badge {% if i.obj.is_connected %}b-ok{% else %}b-muted{% endif %}">{% if i.obj.is_connected %}Connected{% else %}Not connected{% endif %}</span></div>
+    <p class="muted small">{% if i.obj.is_connected %}Live data can be imported for linked campaigns.{% else %}No live integration is active, so spend, clicks and conversions are never shown automatically. Enter results by hand on each campaign. Connecting needs official API access and developer approval from the platform.{% endif %}</p>
+    {% if i.obj.last_message %}<p class="help">{{ i.obj.last_message }}</p>{% endif %}</section>{% endfor %}
+</div>
+<div class="grid g4" style="margin-bottom:16px">
+  <div class="card stat"><div class="stat__label">Ad campaigns</div><div class="stat__value">{{ campaigns|length }}</div><div class="stat__foot">Google &amp; Meta (local)</div></div>
+  <div class="card stat"><div class="stat__label">Ad groups</div><div class="stat__value">{{ groups_total }}</div></div>
+  <div class="card stat"><div class="stat__label">Creatives</div><div class="stat__value">{{ creatives_total }}</div><div class="stat__foot">{{ creatives_pending|length }} awaiting approval</div></div>
+  <div class="card stat"><div class="stat__label">Recorded spend</div><div class="stat__value">{{ totals.spend }}</div><div class="stat__foot">entered manually</div></div>
+</div>
+{% if creatives_pending %}<section class="card" style="margin-bottom:16px"><div class="card__head"><h2>Waiting for approval</h2></div><ul class="list">{% for cr in creatives_pending %}<li><div class="grow"><b>{{ cr.headline }}</b><div class="muted small">{{ cr.ad_group.campaign.name }} · {{ cr.ad_group.name }}</div>{% if cr.body_text %}<div class="small">{{ cr.body_text|truncatechars:140 }}</div>{% endif %}</div>
+  {% if can_approve %}<form method="post" action="{% url 'dashboard:creative_action' cr.pk %}" class="row-actions">{% csrf_token %}<input type="hidden" name="confirm" value="yes"><button class="btn btn-sm btn-ok" name="action" value="approve" data-confirm="Approve this creative? It will not be published anywhere automatically.">Approve</button><button class="btn btn-sm" name="action" value="reject" data-confirm="Reject this creative?">Reject</button></form>{% endif %}</li>{% endfor %}</ul></section>{% endif %}
+<div class="grid g2">
+  <section class="card"><div class="card__head"><h2>Ad campaigns</h2></div>{% if campaigns %}<ul class="list">{% for c in campaigns %}<li><a class="grow" href="{% url 'dashboard:campaign_detail' c.pk %}">{{ c.name }}</a><span class="badge {{ c.status|badge_class }}">{{ c.get_status_display }}</span></li>{% endfor %}</ul>{% else %}<div class="empty small"><p>No ad campaigns yet. Create a campaign and choose Google Ads or Meta Ads as its channel.</p></div>{% endif %}</section>
+  <section class="card"><div class="card__head"><h2>Recent ad groups</h2></div>{% if groups %}<ul class="list">{% for g in groups %}<li><a class="grow" href="{% url 'dashboard:edit' 'ad-groups' g.pk %}">{{ g.name }}<div class="muted small">{{ g.campaign.name }}</div></a><span class="badge {{ g.status|badge_class }}">{{ g.get_status_display }}</span></li>{% endfor %}</ul>{% else %}<div class="empty small"><p>No ad groups yet.</p></div>{% endif %}</section>
+</div>
+{% endblock %}

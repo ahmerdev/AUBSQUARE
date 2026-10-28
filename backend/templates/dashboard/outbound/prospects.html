@@ -1,0 +1,86 @@
+{% extends "dashboard/base.html" %}
+{% load dash %}
+{% block content %}
+<div class="page-head"><div><h1>Prospects</h1><p>Businesses you might sell to. They only become Leads when they show interest.</p></div>
+  <div class="actions">{% if can_export %}<a class="btn" href="{% url 'dashboard:prospects_export' %}?{{ qs }}">{% icon "download" 16 %} Export CSV</a>{% endif %}</div></div>
+
+<div class="ps-stats">
+  <a class="ps-stat" href="?"><span class="ps-stat__i">{% icon "inbox" 18 %}</span><div><b>{{ total }}</b><span>Prospects in your list</span></div></a>
+  <a class="ps-stat" href="?status=new"><span class="ps-stat__i">{% icon "search" 18 %}</span><div><b>{{ counts|get_item:"new"|default:0 }}</b><span>Waiting for a website audit</span></div></a>
+  <a class="ps-stat ps-stat--hot" href="?level=high"><span class="ps-stat__i">{% icon "bolt" 18 %}</span><div><b>{{ high_count }}</b><span>High-opportunity (best to contact first)</span></div></a>
+  <a class="ps-stat" href="?status=audited&email=yes"><span class="ps-stat__i">{% icon "send" 18 %}</span><div><b>{{ ready_count }}</b><span>Audited and have an email</span></div></a>
+</div>
+
+<ol class="flow" aria-label="How prospecting works">
+  <li class="flow__s"><span class="flow__n">1</span><div><b>Find</b><small>Search real businesses by type, country and city, or import a CSV.</small></div></li>
+  <li class="flow__s"><span class="flow__n">2</span><div><b>Audit</b><small>We read their website and score what is missing (WhatsApp, booking, SEO, HTTPS…).</small></div></li>
+  <li class="flow__s"><span class="flow__n">3</span><div><b>Pitch</b><small>A short email is drafted from the real findings with their audit report link. You approve it.</small></div></li>
+  <li class="flow__s"><span class="flow__n">4</span><div><b>Lead</b><small>When they reply, press “Lead banao”. A proposal can follow.</small></div></li>
+</ol>
+
+{% if can_create %}
+<div class="ps-grid">
+  <section class="card ps-find"><div class="card__head"><h2>{% icon "search" 18 %} Find businesses</h2><span class="badge b-info">OpenStreetMap · real listings only</span></div>
+    <form method="post" action="{% url 'dashboard:prospects_discover' %}">{% csrf_token %}
+      <div class="lbl" id="cat-lbl">1 · What kind of business?</div>
+      <div class="chipgrid" role="radiogroup" aria-labelledby="cat-lbl">{% for k, l in categories %}<label class="pick"><input type="radio" name="category" value="{{ k }}" {% if forloop.first %}checked{% endif %}><span><i class="pick__e">{% icon k|catico 20 %}</i>{{ l }}</span></label>{% endfor %}</div>
+      <div class="lbl" style="margin-top:18px">2 · Where?</div>
+      <div class="fgrid">
+        <div class="field"><label class="lbl" for="d-country">Country</label><input class="input" id="d-country" name="country" data-geo-country placeholder="Search a country… e.g. Pakistan" required></div>
+        <div class="field"><label class="lbl" for="d-city">City</label><input class="input" id="d-city" name="city" data-geo-city required placeholder="Choose a country first (or type any city)"></div>
+      </div>
+      <div class="lbl" style="margin-top:6px">3 · How many?</div>
+      <div class="range"><input type="range" name="limit" id="d-limit" min="10" max="80" step="5" value="40" aria-label="How many businesses (max 80)"><output id="d-limit-o">40</output></div>
+      <button class="btn btn-primary btn-block" type="submit" data-busy="Searching OpenStreetMap… this can take up to a minute">{% icon "search" 16 %} Find businesses</button>
+      <div class="help" style="margin-top:10px">Only public listings that have a website, phone or email. Nothing is invented – if the service is busy you are told, and no sample data is ever added. Next step: select them and press “Audit websites”.</div>
+    </form></section>
+  <section class="card ps-import"><div class="card__head"><h2>{% icon "upload" 18 %} Import a CSV</h2></div>
+    <form method="post" action="{% url 'dashboard:prospects_import' %}" enctype="multipart/form-data">{% csrf_token %}
+      <label class="drop" for="csvfile"><span class="drop__ic">{% icon "upload" 28 %}</span><b id="csvname">Choose a CSV file</b><small>or drag it here · max 500 rows · up to 1 MB</small>
+        <input class="visually-hidden" id="csvfile" type="file" name="file" accept=".csv,text/csv" required onchange="document.getElementById('csvname').textContent=this.files[0]?this.files[0].name:'Choose a CSV file'"></label>
+      <div class="help" style="margin:10px 0">Columns: <code>business_name</code> (required), website, email, phone, city, country, category. Duplicates are skipped automatically.</div>
+      <div class="btnrow"><button class="btn btn-primary" type="submit">{% icon "upload" 16 %} Import</button>
+        <a class="btn btn-soft" download="prospects-template.csv" href="data:text/csv;charset=utf-8,business_name%2Cwebsite%2Cemail%2Cphone%2Ccity%2Ccountry%2Ccategory%0AExample%20Dental%20Clinic%2Chttps%3A%2F%2Fexample.com%2Cinfo%40example.com%2C%2B92%20300%201234567%2CLahore%2CPakistan%2Cdental%0A">{% icon "download" 16 %} Template</a></div>
+    </form>
+    <div class="inset" style="margin-top:18px"><b class="small">Tip</b><p class="muted small" style="margin:6px 0 0">Prospects with a website <i>and</i> an email give the best results: the audit supplies the real reasons to write, and the email gets sent only after you approve it.</p></div>
+  </section>
+</div>{% endif %}
+
+<div style="margin-bottom:14px"><div class="tabs">
+  <a href="?{% qs_replace qs status='' %}" class="{% if not g.status %}active{% endif %}">All <span class="n">{{ total }}</span></a>
+  {% for key, label in statuses %}<a href="?{% qs_replace qs status=key %}" class="{% if g.status == key %}active{% endif %}">{{ label }} <span class="n">{{ counts|get_item:key|default:0 }}</span></a>{% endfor %}</div></div>
+<div class="card card--flush">
+  <form class="toolbar" method="get">
+    <div class="grow"><input class="input" type="search" name="q" value="{{ g.q }}" placeholder="Search business, website, email, city…"></div>
+    <div class="filters">
+      <select class="input" name="category" onchange="this.form.submit()"><option value="">All types</option>{% for k, l in categories %}<option value="{{ k }}" {% if g.category == k %}selected{% endif %}>{{ l }}</option>{% endfor %}</select>
+      <select class="input" name="level" onchange="this.form.submit()"><option value="">Any opportunity</option>{% for k, l in levels %}<option value="{{ k }}" {% if g.level == k %}selected{% endif %}>{{ l }}</option>{% endfor %}</select>
+      <select class="input" name="country" onchange="this.form.submit()"><option value="">All countries</option>{% for c in countries %}<option value="{{ c }}" {% if g.country == c %}selected{% endif %}>{{ c }}</option>{% endfor %}</select>
+      <select class="input" name="email" onchange="this.form.submit()"><option value="">Email: any</option><option value="yes" {% if g.email == 'yes' %}selected{% endif %}>Has email</option><option value="no" {% if g.email == 'no' %}selected{% endif %}>No email</option></select>
+    </div>
+    {% if g.status %}<input type="hidden" name="status" value="{{ g.status }}">{% endif %}<button class="btn btn-sm" type="submit">Search</button>
+  </form>
+  {% if can_edit %}
+  <form method="post" action="{% url 'dashboard:prospects_bulk' %}" class="bulkbar" id="bulkbar">{% csrf_token %}
+    <span><b id="bulk-count">0</b> selected</span><span id="bulk-ids"></span><input type="hidden" name="next" value="{{ request.get_full_path }}">
+    <button class="btn btn-sm" name="action" value="audit" type="submit" data-busy="Auditing websites…">Audit websites</button>
+    {% if sequences %}<select class="input" name="sequence" style="width:auto;min-height:34px;padding:4px 10px">{% for s in sequences %}<option value="{{ s.pk }}">{{ s.name }}</option>{% endfor %}</select><button class="btn btn-sm" name="action" value="enroll" type="submit">Add to sequence</button>{% endif %}
+    <button class="btn btn-sm" name="action" value="reject" type="submit">Not a fit</button>
+    {% if can_delete %}<button class="btn btn-sm btn-danger" name="action" value="delete" type="submit" data-confirm="Permanently delete the selected prospects?" data-confirm-title="Delete prospects">Delete</button>{% endif %}
+  </form>{% endif %}
+  {% if page.object_list %}
+  <div class="table-wrap"><table class="t table--stack">
+    <thead><tr>{% if can_edit %}<th style="width:44px"><input class="check" type="checkbox" id="check-all" aria-label="Select all"></th>{% endif %}<th>Business</th><th>Contact</th><th>Where</th><th>Opportunity</th><th>Status</th><th></th></tr></thead>
+    <tbody>{% for p in page.object_list %}<tr>
+      {% if can_edit %}<td class="nolabel"><input class="check js-row-check" type="checkbox" value="{{ p.pk }}" aria-label="Select"></td>{% endif %}
+      <td class="title" data-label="Business"><span class="av">{{ p.business_name|slice:":1"|upper }}</span><div><a href="{% url 'dashboard:prospect_detail' p.pk %}">{{ p.business_name }}</a><div class="muted small">{{ p.get_category_display }} · {{ p.domain|default:"no website" }}</div></div></td>
+      <td data-label="Contact"><div>{{ p.email|default:"—" }}</div><div class="muted small">{{ p.phone }}</div></td>
+      <td data-label="Where">{{ p.city }}{% if p.city and p.country %}, {% endif %}{{ p.country }}</td>
+      <td data-label="Opportunity">{% if p.opportunity_level != 'unknown' %}<div class="pmini"><i class="pmini__b lvl-{{ p.opportunity_level }}" style="width:{{ p.opportunity_score }}%"></i></div><span class="badge {{ p.opportunity_level|badge_class }}">{{ p.opportunity_score }} · {{ p.get_opportunity_level_display }}</span>{% else %}<span class="muted small">not audited</span>{% endif %}</td>
+      <td data-label="Status"><span class="badge {{ p.status|badge_class }}">{{ p.get_status_display }}</span></td>
+      <td class="nolabel"><div class="row-actions">{% if p.opportunity_level != 'unknown' %}<a class="btn btn-sm btn-soft" href="{% url 'dashboard:prospect_report' p.pk %}" target="_blank" rel="noopener" title="Open the audit report you can share">Report</a>{% endif %}<a class="btn btn-sm" href="{% url 'dashboard:prospect_detail' p.pk %}">Open</a></div></td></tr>{% endfor %}</tbody></table></div>
+  {% include "dashboard/_pagination.html" %}
+  {% else %}<div class="empty">{% icon "search" 36 %}<h3>No prospects {% if g.q or g.status or g.category %}match these filters{% else %}yet{% endif %}</h3><p>Use “Find businesses” above, or import a CSV.</p></div>{% endif %}
+</div>
+<script>(function(){var r=document.getElementById("d-limit"),o=document.getElementById("d-limit-o");if(r&&o)r.addEventListener("input",function(){o.textContent=r.value});var d=document.querySelector(".drop");if(d){["dragover","dragenter"].forEach(function(e){d.addEventListener(e,function(ev){ev.preventDefault();d.classList.add("over")})});["dragleave","drop"].forEach(function(e){d.addEventListener(e,function(){d.classList.remove("over")})});d.addEventListener("drop",function(ev){ev.preventDefault();var f=ev.dataTransfer.files,i=document.getElementById("csvfile");if(f&&f.length){i.files=f;document.getElementById("csvname").textContent=f[0].name}})}})();</script>
+{% endblock %}

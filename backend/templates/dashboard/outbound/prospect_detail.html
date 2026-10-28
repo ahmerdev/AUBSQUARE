@@ -1,0 +1,42 @@
+{% extends "dashboard/base.html" %}
+{% load dash %}
+{% block content %}
+<div class="page-head"><div><h1>{{ p.business_name }}</h1><p><span class="badge {{ p.status|badge_class }}">{{ p.get_status_display }}</span> {{ p.get_category_display }}{% if p.city %} · {{ p.city }}{% endif %}{% if p.country %}, {{ p.country }}{% endif %}</p></div>
+  <div class="actions">{% if p.lead %}<a class="btn btn-primary" href="{% url 'dashboard:lead_detail' p.lead.pk %}">Open lead {{ p.lead.reference }}</a>{% endif %}<a class="btn" href="{% url 'dashboard:prospects' %}">All prospects</a></div></div>
+{% if email_why and p.status != 'converted' %}<div class="alert alert--warn" style="margin-bottom:16px">{% icon "info" 18 %}<div><b>Email is blocked for this prospect:</b> {{ email_why }}</div></div>{% endif %}
+<div class="grid g2" style="align-items:start">
+  <div class="stack">
+    <section class="card"><div class="card__head"><h2>Website audit</h2>{% if can_edit and p.website %}<form method="post" action="{% url 'dashboard:prospect_action' p.pk %}">{% csrf_token %}<button class="btn btn-sm" name="action" value="audit" data-busy="Auditing…">{% icon "refresh" 14 %} {% if audit %}Re-audit{% else %}Audit now{% endif %}</button></form>{% endif %}</div>
+      {% if audit %}{% include "dashboard/outbound/_audit.html" %}
+      {% if report_ready %}<div class="reportbox"><div><b>Audit report for {{ p.business_name }}</b><div class="muted small">A private page the prospect sees from the link in your email. {% if p.report_views %}Opened {{ p.report_views }} time{{ p.report_views|pluralize }} · first {{ p.report_first_opened_at|date:"d M, H:i" }}{% else %}Not opened yet.{% endif %}</div></div>
+        <div class="row-actions"><a class="btn btn-sm" href="{% url 'dashboard:prospect_report' p.pk %}" target="_blank" rel="noopener">{% icon "doc" 14 %} Open report</a><button type="button" class="btn btn-sm btn-soft" data-copy="{{ report_url }}">Copy link</button></div></div>{% else %}<div class="reportbox"><div><b>No report page for this prospect</b><div class="muted small">The last check could not open their website, so there is nothing real to show them yet. Press “Re-audit” once the site is reachable – the report link appears here (and in emails) only after a successful audit.</div></div></div>{% endif %}{% else %}<div class="empty small"><p>{% if p.website %}Not audited yet.{% else %}This prospect has no website, so there is nothing to audit.{% endif %}</p></div>{% endif %}</section>
+    <section class="card"><div class="card__head"><h2>Messages</h2></div>
+      {% if msgs %}<ul class="list">{% for m in msgs %}<li><div class="grow"><b>{{ m.get_channel_display }} #{{ m.step }}</b> – {{ m.subject|default:"(no subject)" }}<div class="muted small">{{ m.created_at|date:"d M, H:i" }} · {% if m.generated_by == 'ai' %}written by AI{% else %}from a template{% endif %}</div></div><span class="badge {{ m.status|badge_class }}">{{ m.get_status_display }}</span></li>{% endfor %}</ul>
+      {% else %}<div class="empty small"><p>No messages yet.</p></div>{% endif %}
+      {% if can_edit %}<form method="post" action="{% url 'dashboard:prospect_action' p.pk %}" class="row-actions" style="margin-top:12px">{% csrf_token %}
+        <button class="btn btn-sm btn-primary" name="action" value="draft_email" {% if email_why %}disabled title="{{ email_why }}"{% endif %}>Draft email (template)</button>
+        {% if ai_ready %}<button class="btn btn-sm" name="action" value="draft_ai" {% if email_why %}disabled{% endif %} data-busy="Asking Gemini…">Draft email with AI</button>{% endif %}
+        <button class="btn btn-sm" name="action" value="draft_whatsapp">Draft WhatsApp message</button></form>{% endif %}</section>
+    <section class="card"><div class="card__head"><h2>Activity</h2></div>
+      {% if can_edit %}<form method="post" action="{% url 'dashboard:prospect_action' p.pk %}" class="row-actions" style="margin-bottom:12px">{% csrf_token %}<input type="hidden" name="action" value="note"><input class="input" name="body" placeholder="Add a note (call outcome, who you spoke to…)" style="flex:1"><button class="btn btn-sm">Add</button></form>{% endif %}
+      {% if activity %}<ul class="list">{% for a in activity %}<li><div class="grow">{{ a.body }}<div class="muted small">{{ a.created_at|date:"d M Y, H:i" }}{% if a.author %} · {{ a.author.display_name }}{% endif %}</div></div><span class="badge b-muted">{{ a.kind }}</span></li>{% endfor %}</ul>{% else %}<div class="empty small"><p>Nothing yet.</p></div>{% endif %}</section>
+  </div>
+  <div class="stack">
+    <section class="card"><div class="card__head"><h2>Actions</h2></div>
+      {% if can_edit %}<div class="stack">
+      {% if p.status != 'converted' %}<form method="post" action="{% url 'dashboard:prospect_action' p.pk %}">{% csrf_token %}<input type="hidden" name="action" value="convert">
+        <button class="btn btn-primary" {% if not p.email %}disabled title="Add an email address first"{% endif %} data-confirm="Create a Lead from this prospect? Do this when they have shown interest." data-confirm-title="Lead banao">{% icon "plus" 16 %} Lead banao</button></form>{% endif %}
+      {% if p.whatsapp_link %}<a class="btn" href="{{ p.whatsapp_link }}" target="_blank" rel="noopener noreferrer">{% icon "chat" 16 %} Open WhatsApp chat</a>{% endif %}
+      {% if sequences and p.status != 'converted' %}<form method="post" action="{% url 'dashboard:prospect_action' p.pk %}" class="row-actions">{% csrf_token %}<input type="hidden" name="action" value="enroll"><select class="input" name="sequence">{% for s in sequences %}<option value="{{ s.pk }}">{{ s.name }}</option>{% endfor %}</select><button class="btn btn-sm" {% if email_why %}disabled{% endif %}>Start sequence</button></form>{% endif %}
+      {% for en in enrollments %}{% if en.status == 'active' %}<form method="post" action="{% url 'dashboard:prospect_action' p.pk %}">{% csrf_token %}<input type="hidden" name="action" value="stop_sequences"><div class="muted small">In “{{ en.sequence.name }}” – next step {{ en.next_step }}</div><button class="btn btn-sm">Stop sequence</button></form>{% endif %}{% endfor %}
+      <div class="row-actions">{% if p.status == 'rejected' %}<form method="post" action="{% url 'dashboard:prospect_action' p.pk %}">{% csrf_token %}<button class="btn btn-sm" name="action" value="reopen">Reopen</button></form>{% else %}<form method="post" action="{% url 'dashboard:prospect_action' p.pk %}">{% csrf_token %}<button class="btn btn-sm" name="action" value="reject">Not a fit</button></form>{% endif %}
+        <form method="post" action="{% url 'dashboard:prospect_action' p.pk %}">{% csrf_token %}<button class="btn btn-sm btn-danger" name="action" value="dnc" data-confirm="Add this business to the do-not-contact list? It will never be emailed again." data-confirm-title="Do not contact">Do not contact</button></form>
+        {% if can_delete %}<form method="post" action="{% url 'dashboard:prospect_delete' p.pk %}">{% csrf_token %}<button class="btn btn-sm btn-danger" data-confirm="Delete this prospect and its history?" data-confirm-title="Delete prospect">Delete</button></form>{% endif %}</div></div>
+      {% else %}<p class="muted">You have view-only access.</p>{% endif %}</section>
+    <section class="card"><div class="card__head"><h2>Details</h2></div>
+      {% if can_edit %}<form method="post" action="{% url 'dashboard:prospect_action' p.pk %}" novalidate>{% csrf_token %}<input type="hidden" name="action" value="save"><div class="fgrid">{% for f in form %}<div class="field {% if f.name == 'notes' or f.name == 'address' %}field--wide{% endif %}"><label class="lbl" for="{{ f.id_for_label }}">{{ f.label }}</label>{{ f }}</div>{% endfor %}</div>
+        <p class="muted small" style="margin-top:8px">{% if p.email_source %}Email found at: {{ p.email_source }}. {% endif %}Source: {{ p.get_source_display }} · added {{ p.created_at|date:"d M Y" }}</p><button class="btn btn-primary" type="submit">Save changes</button></form>
+      {% else %}<dl class="kv"><dt>Website</dt><dd>{{ p.website|default:"—" }}</dd><dt>Email</dt><dd>{{ p.email|default:"—" }}</dd><dt>Phone</dt><dd>{{ p.phone|default:"—" }}</dd></dl>{% endif %}</section>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,14 @@
+{% extends "dashboard/base.html" %}
+{% load dash %}
+{% block content %}
+<form method="post" novalidate data-warn-unsaved>{% csrf_token %}
+<div class="page-head"><div><h1>Company billing</h1><p>One place for your legal details. Invoices, receipts and emails all use it. Changing it never rewrites invoices already issued – they keep a snapshot.</p></div><div class="actions">{% if can_edit %}<button class="btn btn-primary" type="submit">Save settings</button>{% endif %}</div></div>
+{% if form.errors %}<div class="alert alert--bad" style="margin-bottom:16px">Please fix the highlighted fields.</div>{% endif %}
+{% if not can_edit %}<div class="alert alert--info" style="margin-bottom:16px">You can view these settings but not change them.</div>{% endif %}
+<div class="alert alert--info" style="margin-bottom:16px">Next invoice number: <b>{{ next_no }}</b>. Bank accounts &amp; gateways: <a href="{% url 'dashboard:billing_methods' %}">Payment methods</a> · Profile PDF: <a href="{% url 'dashboard:company_profile' %}">Company profile</a>. Tax registrations differ by country – fill only what applies to you.</div>
+{% for title, fields in groups %}<section class="card" style="margin-bottom:16px"><div class="card__head"><h2>{{ title }}</h2></div><fieldset {% if not can_edit %}disabled{% endif %} style="border:0;padding:0;margin:0"><div class="fgrid">
+{% for f in fields %}<div class="field {% if f|is_checkbox %}field--check{% endif %} {% if f.name in 'invoice_footer,payment_instructions,default_notes,logo_url,signature_url' %}field--wide{% endif %} {% if f.errors %}has-error{% endif %}">
+{% if f|is_checkbox %}{{ f }}<div class="field__text"><label for="{{ f.id_for_label }}">{{ f.label }}</label>{% if f.help_text %}<div class="help">{{ f.help_text }}</div>{% endif %}{{ f.errors }}</div>
+{% else %}<label class="lbl" for="{{ f.id_for_label }}">{{ f.label }}</label>{{ f }}{% if f.help_text %}<div class="help">{{ f.help_text }}</div>{% endif %}{{ f.errors }}{% endif %}</div>{% endfor %}</div></fieldset></section>{% endfor %}
+</form>
+{% endblock %}

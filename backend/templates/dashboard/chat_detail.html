@@ -1,0 +1,35 @@
+{% extends "dashboard/base.html" %}
+{% load dash %}
+{% block content %}
+<div class="page-head"><div><h1>{{ conv.visitor_name|default:"Anonymous visitor" }}</h1><p>Started {{ conv.created_at|date:"d M Y, H:i" }} · <span class="badge {{ conv.status|badge_class }}" id="chat-status">{{ conv.get_status_display }}</span></p></div>
+  <div class="actions"><a class="btn" href="{% url 'dashboard:chat' %}">← All chats</a></div></div>
+<div class="grid g-form">
+  <section class="card card--flush chat">
+    <div class="card__head" style="padding:14px 18px;margin:0;border-bottom:1px solid var(--line)"><h3>Conversation</h3><span class="muted small">Auto-refreshes every few seconds</span></div>
+    <div class="chat__log" id="chat-log" data-last="{{ last_id }}" data-poll="{% url 'dashboard:chat_poll' conv.pk %}" aria-live="polite">
+      {% for m in msgs %}<div class="msg msg--{{ m.sender }}" data-mid="{{ m.pk }}">{{ m.body }}<small>{% if m.agent %}{{ m.agent.display_name }} · {% elif m.sender == 'bot' %}Bot · {% endif %}{{ m.created_at|date:"H:i" }}</small></div>{% endfor %}
+    </div>
+    {% if can_reply %}
+    <form class="chat__form" id="chat-form" action="{% url 'dashboard:chat_reply' conv.pk %}" method="post">{% csrf_token %}
+      <textarea class="input" name="body" rows="1" placeholder="Type a reply — Enter to send, Shift+Enter for a new line" maxlength="1500" aria-label="Reply" {% if conv.status == 'closed' %}disabled{% endif %}></textarea>
+      <button class="btn btn-primary" type="submit" {% if conv.status == 'closed' %}disabled{% endif %}>{% icon "send" 16 %} Send</button>
+    </form>
+    {% endif %}
+  </section>
+  <aside class="stack">
+    <section class="card"><div class="card__head"><h3>Visitor</h3></div>
+      <dl class="kv" style="grid-template-columns:90px 1fr"><dt>Name</dt><dd>{{ conv.visitor_name|default:"—" }}</dd><dt>Email</dt><dd>{% if conv.visitor_email %}<a href="mailto:{{ conv.visitor_email }}">{{ conv.visitor_email }}</a>{% else %}—{% endif %}</dd><dt>Phone</dt><dd>{{ conv.visitor_phone|default:"—" }}</dd><dt>Page</dt><dd class="mono">{{ conv.page_url|default:"—" }}</dd>
+      <dt>Lead</dt><dd>{% if conv.lead %}<a href="{% url 'dashboard:lead_detail' conv.lead_id %}">{{ conv.lead.reference }}</a>{% else %}—{% endif %}</dd></dl></section>
+    {% if can_reply %}
+    <section class="card"><div class="card__head"><h3>Actions</h3></div>
+      <form method="post" action="{% url 'dashboard:chat_action' conv.pk %}" class="stack-sm">{% csrf_token %}
+        <div class="inline-form"><select class="input" name="assigned_to"><option value="">Unassigned</option>{% for u in staff %}<option value="{{ u.pk }}" {% if conv.assigned_to_id == u.pk %}selected{% endif %}>{{ u.display_name }}</option>{% endfor %}</select><button class="btn btn-sm" name="action" value="assign">Assign</button></div>
+        {% if not conv.lead and conv.visitor_email %}<button class="btn btn-block" name="action" value="to_lead">Create lead from chat</button>{% endif %}
+        {% if conv.status == 'closed' %}<button class="btn btn-block" name="action" value="reopen">Re-open</button>{% else %}<button class="btn btn-block" name="action" value="close" data-confirm="Close this conversation? The visitor will be told it was closed." data-confirm-title="Close conversation">Close conversation</button>{% endif %}
+      </form>
+      {% if request.user|has_perm:"chatbot.delete" %}<form method="post" action="{% url 'dashboard:chat_delete' conv.pk %}" style="margin-top:10px">{% csrf_token %}<button class="btn btn-danger btn-block" type="submit" data-confirm="Permanently delete this conversation?" data-confirm-title="Delete conversation">Delete conversation</button></form>{% endif %}
+    </section>
+    {% endif %}
+  </aside>
+</div>
+{% endblock %}

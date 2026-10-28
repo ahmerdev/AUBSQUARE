@@ -1,0 +1,32 @@
+{% extends "dashboard/base.html" %}
+{% load dash %}
+{% block content %}
+<div class="page-head"><div><h1>Outreach</h1><p>Every message is checked against your safety rules and must be approved by a person before it is sent.</p></div>
+  <div class="actions"><a class="btn" href="{% url 'dashboard:sequences' %}">Sequences</a><a class="btn" href="{% url 'dashboard:list' 'outreach-templates' %}">Templates</a><a class="btn" href="{% url 'dashboard:list' 'do-not-contact' %}">Do-not-contact</a>
+    {% if can_approve %}<form method="post" action="{% url 'dashboard:outreach_bulk' %}">{% csrf_token %}<button class="btn btn-primary" name="action" value="send" data-confirm="Send all approved emails now? Today's remaining allowance: {{ remaining }}." data-confirm-title="Send approved emails">{% icon "send" 16 %} Send approved emails</button></form>{% endif %}</div></div>
+<div class="alert alert--info" style="margin-bottom:14px">{% icon "info" 18 %}<div>Daily allowance: <b>{{ remaining }}</b> of {{ limit }} emails left today. Emails go through your normal mail queue; replies stop follow-ups automatically when inbound sync (IMAP) is on.</div></div>
+{% for label, ok, url, why in ready %}{% if not ok %}<div class="alert alert--warn" style="margin-bottom:8px">{% icon "info" 18 %}<div><b>{{ label }}</b> – {{ why }} <a href="{{ url }}">Fix</a></div></div>{% endif %}{% endfor %}
+<div style="margin:14px 0"><div class="tabs">{% for k, l in tabs %}<a href="?tab={{ k }}" class="{% if tab == k %}active{% endif %}">{{ l }} <span class="n">{{ counts|get_item:k }}</span></a>{% endfor %}</div></div>
+{% if tab == 'waiting' and counts.waiting and can_approve %}<form method="post" action="{% url 'dashboard:outreach_bulk' %}" style="margin-bottom:12px">{% csrf_token %}<button class="btn" name="action" value="approve_all" data-confirm="Approve every waiting email that passes the safety checks? Read them first!" data-confirm-title="Approve all">Approve all that pass the checks</button></form>{% endif %}
+{% for m, why, final in items %}
+<section class="card msgcard" style="margin-bottom:12px">
+  <div class="card__head"><div><a href="{% url 'dashboard:prospect_detail' m.prospect.pk %}"><b>{{ m.prospect.business_name }}</b></a> <span class="muted small">· {{ m.get_channel_display }} #{{ m.step }} · {% if m.generated_by == 'ai' %}written by AI{% elif m.generated_by == 'template' %}template (not AI){% else %}{{ m.generated_by }}{% endif %}</span></div>
+    <span class="badge {{ m.status|badge_class }}">{{ m.get_status_display }}</span></div>
+  {% if why or m.block_reason %}<div class="alert alert--warn" style="margin-bottom:10px">{% icon "info" 18 %}<div>{{ why|default:m.block_reason }}</div></div>{% endif %}
+  {% if m.error %}<div class="alert alert--bad" style="margin-bottom:10px">{{ m.error }}</div>{% endif %}
+  {% if m.status in 'draft,approved,failed' and can_edit %}
+  <form method="post" action="{% url 'dashboard:outreach_action' m.pk %}" class="stack-sm">{% csrf_token %}<input type="hidden" name="tab" value="{{ tab }}">
+    {% if m.channel == 'email' %}<div class="field"><label class="lbl">To: {{ m.prospect.email|default:"(no email)" }} – Subject</label><input class="input" name="subject" value="{{ m.subject }}"></div>{% endif %}
+    <div class="field"><label class="lbl">Message</label><textarea class="input" name="body" rows="8">{{ m.body }}</textarea>{% if m.channel == 'email' %}<div class="help">Your links, postal address and the unsubscribe line are added automatically when it is sent.</div>{% endif %}</div>
+    <div class="row-actions"><button class="btn btn-sm" name="action" value="save">Save</button>
+      {% if m.channel == 'email' and m.status != 'approved' and can_approve %}<button class="btn btn-sm btn-primary" name="action" value="approve" {% if why %}disabled{% endif %}>Approve</button>{% endif %}
+      {% if m.channel == 'whatsapp' %}{% if m.prospect.whatsapp_link %}<a class="btn btn-sm btn-primary" target="_blank" rel="noopener noreferrer" href="{{ m.prospect.whatsapp_link }}?text={{ m.body|urlencode }}">Open in WhatsApp</a><button class="btn btn-sm" name="action" value="mark_sent">I sent it</button>{% else %}<span class="muted small">No phone number for WhatsApp.</span>{% endif %}{% endif %}
+      <button class="btn btn-sm" name="action" value="skip">Skip</button></div></form>
+  {% if final %}<details class="asent"><summary>See exactly what the prospect will receive</summary><pre>{{ final }}</pre><p class="muted small">Saved edits above are included. Links point to {{ site_url }} – they only work for the prospect when this is your real public website address.</p></details>{% endif %}
+  {% else %}<div class="small" style="white-space:pre-wrap">{% if m.subject %}<b>{{ m.subject }}</b>{% endif %}
+{{ m.body|truncatechars:500 }}</div><div class="muted small" style="margin-top:6px">{% if m.sent_at %}Sent {{ m.sent_at|date:"d M Y, H:i" }}{% endif %}{% if m.approved_by %} · approved by {{ m.approved_by.display_name }}{% endif %}</div>
+    {% if m.channel == 'whatsapp' and m.status == 'sent' %}{% endif %}{% endif %}
+</section>
+{% empty %}<div class="card"><div class="empty">{% icon "send" 36 %}<h3>Nothing here</h3><p>{% if tab == 'waiting' %}Open a prospect and press “Draft email”, or add prospects to a sequence.{% else %}No messages in this list.{% endif %}</p></div></div>{% endfor %}
+{% include "dashboard/_pagination.html" %}
+{% endblock %}

@@ -1,0 +1,9 @@
+{% extends "dashboard/base.html" %}
+{% block content %}
+<div class="page-head"><div><h1>Add lead</h1><p>For enquiries that arrive by phone, WhatsApp or in person.</p></div></div>
+<form method="post" class="card" style="max-width:760px">{% csrf_token %}
+  {{ form.non_field_errors }}
+  <div class="fgrid">{% for f in form %}<div class="field {% if f.errors %}has-error{% endif %} {% if f.name == 'message' %}field--wide{% endif %}"><label class="lbl" for="{{ f.id_for_label }}">{{ f.label }}</label>{{ f }}{{ f.errors }}</div>{% endfor %}</div>
+  <div class="actions"><button class="btn btn-primary" type="submit">Create lead</button><a class="btn" href="{% url 'dashboard:leads' %}">Cancel</a></div>
+</form>
+{% endblock %}

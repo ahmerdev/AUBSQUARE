@@ -1,0 +1,5 @@
+<div class="rt" data-richtext>
+  <div class="rt__editor"></div>
+  <textarea name="{{ widget.name }}" class="rt__source" hidden{% include "django/forms/widgets/attrs.html" %}>{{ widget.value|default_if_none:'' }}</textarea>
+  <p class="help">Headings, lists, links and images are supported. Content is sanitized on save; scripts and inline styles are removed.</p>
+</div>

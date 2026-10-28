@@ -1,0 +1,93 @@
+{% extends "dashboard/base.html" %}
+{% load static dash %}
+{% block content %}
+<div class="page-head">
+  <div><h1>Branding &amp; logo</h1><p>Your logo, name and Google Fonts. Changes show in the live preview straight away and go live on the website and in this dashboard when you press Save.</p></div>
+  <div class="actions"><a class="btn" href="/" target="_blank" rel="noopener">{% icon "external" 16 %} View website</a></div>
+</div>
+{% if form.non_field_errors %}<div class="alert alert--bad" role="alert" style="margin-bottom:16px">{{ form.non_field_errors }}</div>{% endif %}
+
+<form method="post" class="bl" id="brand-form" data-warn-unsaved novalidate>{% csrf_token %}
+<div class="bl__form">
+
+  <section class="card fieldset fsec" id="fs-identity">
+    <header class="fsec__head"><span class="fsec__num">1</span><div class="fsec__title"><h2>Logo &amp; identity</h2><span>What visitors see in the header</span></div><span class="chev">{% icon "down" 18 %}</span></header>
+    <div class="body"><div class="fgrid">
+      {% for f in form %}{% if f.name == 'logo_url' or f.name == 'favicon_url' %}
+      <div class="field field--wide {% if f.errors %}has-error{% endif %}"><label class="lbl" for="{{ f.id_for_label }}">{{ f.label }}</label>{{ f }}{% if f.help_text %}<div class="help">{{ f.help_text }}</div>{% endif %}{{ f.errors }}</div>
+      {% endif %}{% endfor %}
+      {% for f in form %}{% if f.name == 'site_name' or f.name == 'tagline' %}
+      <div class="field {% if f.errors %}has-error{% endif %}"><label class="lbl" for="{{ f.id_for_label }}">{{ f.label }} <span class="req">*</span></label>{{ f }}{% if f.help_text %}<div class="help">{{ f.help_text }}</div>{% endif %}{{ f.errors }}</div>
+      {% endif %}{% endfor %}
+      {% with f=form.header_show_name %}
+      <div class="field field--check field--wide">{{ f }}<div class="field__text"><label for="{{ f.id_for_label }}">{{ f.label }}</label><div class="help">{{ f.help_text }}</div>{{ f.errors }}</div></div>
+      {% endwith %}
+    </div></div>
+  </section>
+
+  <section class="card fieldset fsec" id="fs-typography">
+    <header class="fsec__head"><span class="fsec__num">2</span><div class="fsec__title"><h2>Typography</h2><span>Google Fonts for the website and this dashboard</span></div><span class="chev">{% icon "down" 18 %}</span></header>
+    <div class="body"><div class="fgrid">
+      {% with f=form.heading_font %}<div class="field field--wide {% if f.errors %}has-error{% endif %}"><label class="lbl">{{ f.label }}</label>{{ f }}<div class="help">{{ f.help_text }}</div>{{ f.errors }}</div>{% endwith %}
+      {% with f=form.body_font %}<div class="field field--wide {% if f.errors %}has-error{% endif %}"><label class="lbl">{{ f.label }}</label>{{ f }}<div class="help">{{ f.help_text }}</div>{{ f.errors }}</div>{% endwith %}
+      <div class="field field--wide"><div class="typesample" id="typesample">
+        <div class="typesample__h" data-sample="heading">Design that grows your business</div>
+        <p class="typesample__p" data-sample="body">We build brands, websites and digital products for startups and small businesses — clear, fast and made to convert visitors into customers.</p>
+        <div class="typesample__row"><span class="typesample__btn" data-sample="body">Get a free quote</span><span class="typesample__small" data-sample="body">Replies within one working day</span></div>
+      </div></div>
+    </div></div>
+  </section>
+
+  <section class="card fieldset fsec" id="fs-colours">
+    <header class="fsec__head"><span class="fsec__num">3</span><div class="fsec__title"><h2>Brand colours</h2><span>Saved with your brand</span></div><span class="chev">{% icon "down" 18 %}</span></header>
+    <div class="body">
+      <div class="alert alert--info" style="margin-bottom:20px">{% icon "info" 18 %}<div>These colours are stored with your brand. The 3D website currently keeps its built-in colour theme, so changing them does not recolour the site yet.</div></div>
+      <div class="fgrid">
+      {% for f in form %}{% if f.name == 'primary_color' or f.name == 'secondary_color' or f.name == 'accent_color' or f.name == 'background_color' %}
+      <div class="field {% if f.errors %}has-error{% endif %}"><label class="lbl" for="{{ f.id_for_label }}">{{ f.label }}</label>{{ f }}{{ f.errors }}</div>
+      {% endif %}{% endfor %}
+    </div></div>
+  </section>
+
+  <div class="sticky-save bl__save">
+    {% if can_edit %}<button class="btn btn-primary" type="submit">{% icon "check" 16 %} Save branding</button>
+    <button class="btn btn-ghost" type="button" id="bl-reset">Undo changes</button>
+    <span class="fl__dirty fl__dirty--inline"><i></i><b class="state-dirty">Unsaved changes</b></span>
+    <span class="muted small" style="margin-left:auto">{% if s.updated_at %}Last saved {{ s.updated_at|timesince }} ago{% endif %}</span>
+    {% else %}<span class="muted">You can view branding but not change it.</span>{% endif %}
+  </div>
+</div>
+
+<aside class="bl__preview" aria-label="Live preview of the website" id="pv" data-base="{{ preview_base }}">
+  <div class="pv card">
+    <div class="pv__bar">
+      <div class="seg" role="group" aria-label="Device">
+        <button type="button" class="on" data-device="desktop" title="Desktop">{% icon "monitor" 17 %}<span>Desktop</span></button>
+        <button type="button" data-device="tablet" title="Tablet">{% icon "tablet" 17 %}<span>Tablet</span></button>
+        <button type="button" data-device="mobile" title="Mobile">{% icon "phone" 17 %}<span>Mobile</span></button>
+      </div>
+      <select class="input pv__page" id="pv-page" aria-label="Page to preview">{% for label, path in preview_pages %}<option value="{{ path }}">{{ label }}</option>{% endfor %}</select>
+      <button type="button" class="iconbtn iconbtn--solid" id="pv-reload" title="Reload preview" aria-label="Reload preview">{% icon "refresh" 17 %}</button>
+      <button type="button" class="iconbtn iconbtn--solid" id="pv-full" title="Full screen" aria-label="Full screen preview">{% icon "expand" 17 %}</button>
+    </div>
+    <div class="pv__addr">
+      <label for="pv-addr">Website address</label>
+      <input type="text" id="pv-addr" class="input" placeholder="Same as dashboard (leave empty), or http://localhost:3000" autocomplete="off" spellcheck="false">
+      <button type="button" class="btn btn-soft" id="pv-addr-go">Use</button>
+    </div>
+    <div class="pv__stage" id="pv-stage" data-device="desktop">
+      <div class="pv__device" id="pv-device"><iframe id="pv-frame" src="about:blank" title="Website preview" loading="eager"></iframe></div>
+      <div class="pv__loading" id="pv-loading">Loading preview…</div>
+      <div class="pv__fail hide" id="pv-fail" role="status">
+        <b>The website didn’t answer at <code id="pv-fail-addr"></code></b>
+        <p>The dashboard and the website can run on different addresses while you develop. Start the website (<code>npm run dev</code> → usually <code>http://localhost:3000</code>, or run <code>npm run build</code> so Django can serve it) and pick the address:</p>
+        <div class="pv__fail-actions"><button type="button" class="btn btn-soft" data-addr="http://localhost:3000">Use localhost:3000</button><button type="button" class="btn btn-soft" data-addr="http://localhost:5173">Use localhost:5173</button><button type="button" class="btn btn-soft" data-addr="">Use this server</button><button type="button" class="btn" id="pv-open">Open in new tab</button></div>
+      </div>
+    </div>
+    <p class="pv__note"><b id="pv-size">Desktop · 1440 px</b> · Shows your unsaved changes. Nothing is published until you press Save, and previews are never counted as visits.</p>
+  </div>
+</aside>
+</form>
+{{ fonts_data|json_script:"font-data" }}
+{% endblock %}
+{% block js %}<script src="{% static 'dashboard/branding.js' %}"></script>{% endblock %}

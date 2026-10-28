@@ -1,0 +1,14 @@
+{% extends "dashboard/base.html" %}
+{% load dash %}
+{% block content %}
+<form method="post" novalidate data-warn-unsaved>{% csrf_token %}
+<div class="page-head"><div><h1>Outbound settings</h1><p>Safety limits, regions, AI, instant replies and scoring. Secrets are encrypted and never shown again.</p></div><div class="actions"><button class="btn btn-primary" type="submit">Save settings</button></div></div>
+{% if form.errors %}<div class="alert alert--bad" style="margin-bottom:16px">Please fix the highlighted fields.</div>{% endif %}
+{% for title, fields in groups %}
+<section class="card" style="margin-bottom:16px"><div class="card__head"><h2>{{ title }}</h2></div><div class="fgrid">
+{% for f in fields %}<div class="field {% if f|is_checkbox %}field--check{% endif %} {% if f.name == 'allowed_countries' or f.name == 'auto_reply_body' or f.name == 'postal_address' %}field--wide{% endif %} {% if f.errors %}has-error{% endif %}">
+  {% if f|is_checkbox %}{{ f }}<div class="field__text"><label for="{{ f.id_for_label }}">{{ f.label }}</label>{% if f.help_text %}<div class="help">{{ f.help_text }}</div>{% endif %}{{ f.errors }}</div>
+  {% else %}<label class="lbl" for="{{ f.id_for_label }}">{{ f.label }}</label>{{ f }}{% if f.name == 'gemini_key' and has_key %}<div class="help">A key is saved (hidden). Leave blank to keep it.</div>{% endif %}{% if f.help_text %}<div class="help">{{ f.help_text }}</div>{% endif %}{{ f.errors }}{% endif %}</div>{% endfor %}
+</div></section>{% endfor %}
+</form>
+{% endblock %}

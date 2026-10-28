@@ -1,0 +1,136 @@
+{% load static dash %}<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+{% include "dashboard/_head.html" %}
+<title>{% block title %}{{ page_title|default:"Dashboard" }}{% endblock %} · {{ brand.name|default:"AUB SQUARE" }}</title>
+{% block head %}{% endblock %}
+</head>
+<body>
+<div class="app">
+  <header class="topnav">
+    <a class="pill brandpill" href="{% url 'dashboard:home' %}" aria-label="{{ brand.name }} dashboard home">
+      {% include "dashboard/_brandmark.html" %}
+      <span class="brand__text"><b>{{ brand.name }}</b><span>Control Center</span></span>
+    </a>
+    <nav class="pill groupnav" aria-label="Sections">
+      {% for g in nav_groups %}<a href="{{ g.url }}" class="{% if g.active %}active{% endif %}" {% if g.active %}aria-current="true"{% endif %}>{{ g.title }}{% if g.count %}<em class="count">{{ g.count }}</em>{% endif %}</a>{% endfor %}
+    </nav>
+    <div class="pill tools">
+      <button class="iconbtn" type="button" data-spotlight aria-label="Search (press /)" title="Search  ( / )">{% icon "search" 19 %}</button>
+      <a class="iconbtn desktop-only" href="/" target="_blank" rel="noopener" aria-label="View website" title="View website">{% icon "external" 18 %}</a>
+      <div class="dropdown">
+        <button class="iconbtn" id="notif-btn" type="button" data-menu-btn data-feed="{% url 'dashboard:notifications_feed' %}" aria-label="Notifications">
+          {% icon "bell" 19 %}{% if unread_count %}<span class="dot" id="notif-dot">{{ unread_count }}</span>{% endif %}
+        </button>
+        <div class="menu menu--wide" role="menu">
+          <div class="menu__head"><span>Notifications</span><button type="button" class="btn btn-sm btn-ghost" id="notif-markall" data-url="{% url 'dashboard:notifications_read_all' %}">Mark all read</button></div>
+          <div id="notif-list"><div class="skeleton" style="height:48px;margin:6px"></div></div>
+          <hr><a href="{% url 'dashboard:notifications' %}">View all notifications</a>
+        </div>
+      </div>
+      <button class="iconbtn menu-btn" type="button" data-menu-sheet aria-label="Open menu">{% icon "menu" 21 %}</button>
+    </div>
+    <div class="pill userpill dropdown desktop-only">
+      <button class="userbtn" type="button" data-menu-btn aria-label="Account menu">
+        <span class="avatar">{% if request.user.avatar_url %}<img src="{{ request.user.avatar_url }}" alt="">{% else %}{{ request.user.initials }}{% endif %}</span>
+        <span class="who"><b>{{ request.user.display_name }}</b><span>{% if request.user.is_superuser %}Super Admin{% else %}{{ request.user.role|default:"Staff" }}{% endif %}</span></span>
+        {% icon "down" 15 "chev" %}
+      </button>
+      <div class="menu" role="menu">
+        <div style="padding:10px 12px"><b>{{ request.user.display_name }}</b><div class="muted small">{{ request.user.email }}</div></div><hr>
+        <a href="{% url 'accounts:profile' %}">{% icon "users" 17 %} My profile</a>
+        <a href="/" target="_blank" rel="noopener">{% icon "external" 17 %} View website</a>
+        <hr>
+        <form method="post" action="{% url 'accounts:logout' %}">{% csrf_token %}<button class="mi" type="submit">{% icon "logout" 17 %} Sign out</button></form>
+      </div>
+    </div>
+  </header>
+
+  <aside class="rail" aria-label="Dashboard pages">
+    <button class="rail__handle" type="button" data-rail-toggle aria-label="Collapse or expand the menu" title="Collapse / expand menu">{% icon "back" 15 %}</button>
+    <div class="theme-toggle" role="group" aria-label="Colour theme">{% include "dashboard/_theme_toggle.html" %}</div>
+    <nav class="railnav" id="railnav" aria-label="Pages">
+      {% for g in nav_groups %}
+      <h6 class="railnav__title"><span>{{ g.title }}</span></h6>
+      {% for i in g.items %}
+      <a href="{{ i.url }}" class="{% if i.active %}active{% endif %}" {% if i.active %}aria-current="page"{% endif %} data-tip="{{ i.label }}">
+        {% icon i.icon 20 %}<span class="lbl">{{ i.label }}</span>{% if i.count %}<em class="count">{{ i.count }}</em>{% endif %}
+      </a>
+      {% endfor %}
+      {% endfor %}
+    </nav>
+    <div class="railfoot">
+      <button class="railbtn" type="button" data-rail-toggle aria-label="Collapse or expand the menu" data-tip="Expand menu">{% icon "panel" 20 %}<span class="lbl">Collapse menu</span></button>
+      <form method="post" action="{% url 'accounts:logout' %}">{% csrf_token %}<button class="railbtn" type="submit" aria-label="Sign out" data-tip="Sign out">{% icon "logout" 20 %}<span class="lbl">Sign out</span></button></form>
+    </div>
+  </aside>
+<div class="railtip" id="railtip" role="tooltip"></div>
+
+  <div class="main">
+    <main class="content" id="main">
+      {% if crumbs %}<nav class="crumbs" aria-label="Breadcrumb">{% for label, url in crumbs %}{% if not forloop.first %}<span class="sep">/</span>{% endif %}{% if url %}<a href="{{ url }}">{{ label }}</a>{% else %}<span aria-current="page">{{ label }}</span>{% endif %}{% endfor %}</nav>{% endif %}
+      {% block content %}{% endblock %}
+    </main>
+  </div>
+</div>
+
+<div class="spotlight" id="spotlight" role="dialog" aria-modal="true" aria-label="Search the dashboard">
+  <div class="spotlight__box">
+    <div class="search">
+      {% icon "search" 19 %}
+      <input id="global-search" type="search" placeholder="Search leads, posts, services, people…" autocomplete="off" data-url="{% url 'dashboard:search' %}" aria-label="Search the dashboard">
+      <kbd>Esc</kbd>
+    </div>
+    <div class="search-results" id="search-results" role="listbox"></div>
+    <div class="spot-hint" id="spot-hint">Type at least 2 letters. Tip: press <b>/</b> anywhere to open search.</div>
+  </div>
+</div>
+
+<div class="menu-sheet" id="menu-sheet" role="dialog" aria-modal="true" aria-label="Menu">
+  <div class="menu-sheet__box">
+    <div class="menu-sheet__head">
+      <a class="brandpill" style="padding:0;height:auto" href="{% url 'dashboard:home' %}">{% include "dashboard/_brandmark.html" %}<span class="brand__text"><b>{{ brand.name }}</b><span>Control Center</span></span></a>
+      <button type="button" class="iconbtn iconbtn--solid" data-menu-sheet-close aria-label="Close menu">{% icon "x" 19 %}</button>
+    </div>
+    <div class="sheet-theme" role="group" aria-label="Colour theme"><button type="button" data-theme-set="light">{% icon "sun" 17 %} Light</button><button type="button" data-theme-set="dark">{% icon "moon" 17 %} Dark</button></div>
+    <nav>
+      {% for g in nav_groups %}
+      <h6>{{ g.title }}</h6>
+      {% for i in g.items %}<a href="{{ i.url }}" class="{% if i.active %}active{% endif %}">{% icon i.icon 19 %}<span>{{ i.label }}</span>{% if i.count %}<em class="count">{{ i.count }}</em>{% endif %}</a>{% endfor %}
+      {% endfor %}
+      <h6>Account</h6>
+      <a href="{% url 'accounts:profile' %}">{% icon "users" 19 %}<span>My profile</span></a>
+      <a href="/" target="_blank" rel="noopener">{% icon "external" 19 %}<span>View website</span></a>
+    </nav>
+    <form method="post" action="{% url 'accounts:logout' %}" style="margin-top:12px">{% csrf_token %}<button class="btn btn-danger btn-block" type="submit">{% icon "logout" 17 %} Sign out</button></form>
+  </div>
+</div>
+
+<div class="toasts" id="toasts" aria-live="polite"></div>
+{{ flash_messages|json_script:"django-messages" }}
+
+<div class="modal" id="confirm-modal" role="dialog" aria-modal="true" aria-labelledby="confirm-title">
+  <div class="modal__box"><div class="modal__head"><h3 id="confirm-title">Please confirm</h3></div><p class="muted" id="confirm-text"></p>
+    <div class="modal__foot"><button type="button" class="btn" data-close-modal>Cancel</button><button type="button" class="btn btn-primary" id="confirm-ok">Confirm</button></div></div>
+</div>
+
+{% if has_picker %}
+<div class="modal" id="picker-modal" role="dialog" aria-modal="true" aria-label="Media library">
+  <div class="modal__box modal__box--lg">
+    <div class="modal__head"><h3>Choose from media library</h3><button type="button" class="iconbtn" data-close-modal aria-label="Close">{% icon "x" 18 %}</button></div>
+    <div class="inline-form" style="margin-bottom:12px"><input id="picker-q" class="input" type="search" placeholder="Search files…"></div>
+    {% if request.user|has_perm:"media.create" %}<div class="dropzone" data-dropzone="picker" style="margin-bottom:12px;padding:14px">Drop images here or click to upload<input type="file" accept="image/*,.pdf" multiple hidden></div><div class="progress"><i></i></div>{% endif %}
+    <div class="media-grid" id="picker-grid"></div>
+    <div class="modal__foot" style="justify-content:space-between"><span class="muted small" id="picker-pages"></span><span><button type="button" class="btn btn-sm" id="picker-prev">Previous</button> <button type="button" class="btn btn-sm" id="picker-next">Next</button></span></div>
+  </div>
+</div>
+{% endif %}
+
+<script src="{% static 'dashboard/theme.js' %}"></script>
+<script src="{% static 'dashboard/vendor/chart.umd.js' %}"></script>
+{% if has_richtext %}<link rel="stylesheet" href="{% static 'dashboard/vendor/quill.snow.css' %}"><script src="{% static 'dashboard/vendor/quill.js' %}"></script>{% endif %}
+{% block pre_js %}{% endblock %}
+<script src="{% vstatic 'dashboard/dashboard.js' %}"></script>
+{% block js %}{% endblock %}
+</body>
+</html>

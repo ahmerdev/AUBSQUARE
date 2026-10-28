@@ -1,0 +1,38 @@
+{% extends "dashboard/base.html" %}
+{% load dash %}
+{% block content %}
+<div class="page-head"><div><h1>Comment moderation</h1><p>Nothing appears on the site until you approve it. Links, repeated text and blocked words are caught automatically.</p></div>
+  <div class="actions"><a class="btn" href="{% url 'dashboard:list' 'posts' %}">Back to posts</a></div></div>
+<div style="margin-bottom:14px" class="tabs">
+  {% for key, label in statuses %}<a href="?status={{ key }}" class="{% if status == key %}active{% endif %}">{{ label }} <span class="n">{{ counts|get_item:key }}</span></a>{% endfor %}<a href="?status=all" class="{% if status == 'all' %}active{% endif %}">All</a>
+</div>
+<div class="card card--flush">
+  <form class="toolbar" method="get"><input type="hidden" name="status" value="{{ status }}"><div class="grow"><input class="input" type="search" name="q" value="{{ q }}" placeholder="Search author, email, text or post…"></div><button class="btn btn-sm" type="submit">Search</button></form>
+  {% for c in page.object_list %}
+  <article class="pad" style="border-bottom:1px solid var(--line)">
+    <div style="display:flex;gap:12px;flex-wrap:wrap;justify-content:space-between">
+      <div><b>{{ c.name }}</b> <span class="muted small">&lt;{{ c.email }}&gt;</span> {% if c.is_staff_reply %}<span class="badge b-brand">Staff</span>{% endif %}<div class="muted small">on <a href="{% url 'dashboard:edit' 'posts' c.post_id %}">{{ c.post.title|truncatechars:60 }}</a> · {{ c.created_at|timesince }} ago{% if c.parent %} · reply to {{ c.parent.name }}{% endif %}</div></div>
+      <span class="badge {{ c.status|badge_class }}">{{ c.get_status_display }}</span>
+    </div>
+    <p style="margin:10px 0;white-space:pre-wrap;overflow-wrap:anywhere">{{ c.body }}</p>
+    {% if c.spam_reason %}<div class="muted small">Flagged: {{ c.spam_reason }}</div>{% endif %}
+    {% if can_moderate %}
+    <div class="actions" style="margin-top:8px">
+      <form method="post" action="{% url 'dashboard:comment_action' c.pk %}">{% csrf_token %}<input type="hidden" name="next" value="{{ request.get_full_path }}">
+        {% if c.status != 'approved' %}<button class="btn btn-sm btn-ok" name="action" value="approve">{% icon "check" 14 %} Approve</button>{% endif %}
+        {% if c.status != 'rejected' %}<button class="btn btn-sm" name="action" value="reject">Reject</button>{% endif %}
+        {% if c.status != 'spam' %}<button class="btn btn-sm" name="action" value="spam">Spam</button>{% endif %}
+        {% if c.status != 'pending' %}<button class="btn btn-sm btn-ghost" name="action" value="pending">Back to pending</button>{% endif %}
+      </form>
+      <button class="btn btn-sm btn-ghost" type="button" data-open-modal="reply-{{ c.pk }}">Reply</button>
+      {% if can_delete %}<form method="post" action="{% url 'dashboard:comment_delete' c.pk %}">{% csrf_token %}<input type="hidden" name="next" value="{{ request.get_full_path }}"><button class="btn btn-sm btn-danger" type="submit" data-confirm="Delete this comment permanently?" data-confirm-title="Delete comment">{% icon "trash" 14 %}</button></form>{% endif %}
+    </div>
+    <div class="modal" id="reply-{{ c.pk }}" role="dialog" aria-modal="true"><div class="modal__box"><div class="modal__head"><h3>Reply to {{ c.name }}</h3></div>
+      <form method="post" action="{% url 'dashboard:comment_action' c.pk %}">{% csrf_token %}<input type="hidden" name="action" value="reply"><input type="hidden" name="next" value="{{ request.get_full_path }}"><textarea class="input" name="body" rows="5" required maxlength="2000" placeholder="Your public reply (shown as ‘{{ request.user.display_name }}’)"></textarea>
+        <div class="modal__foot"><button class="btn" type="button" data-close-modal>Cancel</button><button class="btn btn-primary" type="submit">Publish reply</button></div></form></div></div>
+    {% endif %}
+  </article>
+  {% empty %}<div class="empty">{% icon "chat" 36 %}<h3>No {% if status != 'all' %}{{ status }} {% endif %}comments</h3><p>New reader comments will show up here for review.</p></div>{% endfor %}
+  {% include "dashboard/_pagination.html" %}
+</div>
+{% endblock %}

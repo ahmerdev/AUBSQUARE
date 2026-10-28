@@ -1,0 +1,15 @@
+{% extends "dashboard/base.html" %}
+{% load dash %}
+{% block content %}
+<div class="page-head"><div><h1>Payments</h1><p>Money only counts once it is <b>confirmed</b> against a real bank or provider record. Pending transfers wait here for verification.</p></div>
+  <div class="actions">{% if can_export %}<a class="btn" href="{% url 'dashboard:payments_export' %}">{% icon "download" 16 %} Export CSV</a>{% endif %}</div></div>
+<div style="margin-bottom:14px"><div class="tabs">{% for k, l in statuses %}<a href="?status={{ k }}" class="{% if status == k %}active{% endif %}">{{ l }} <span class="n">{{ counts|get_item:k|default:0 }}</span></a>{% endfor %}<a href="?status=all" class="{% if status == 'all' %}active{% endif %}">All</a></div></div>
+<div class="card card--flush"><form class="toolbar" method="get" style="flex-wrap:wrap;gap:8px"><input type="hidden" name="status" value="{{ status }}"><div class="grow"><input class="input" type="search" name="q" value="{{ g.q }}" placeholder="Invoice, client, reference, receipt…"></div>
+  <select class="input" style="max-width:110px" name="currency"><option value="">Currency</option>{% for c in currencies %}<option {% if g.currency == c %}selected{% endif %}>{{ c }}</option>{% endfor %}</select>
+  <select class="input" style="max-width:200px" name="method"><option value="">Method</option>{% for k, l in kinds %}<option value="{{ k }}" {% if g.method == k %}selected{% endif %}>{{ l }}</option>{% endfor %}</select><button class="btn btn-sm">Filter</button></form>
+{% if page.object_list %}<div class="table-wrap"><table class="t table--stack"><thead><tr><th>Payment</th><th>Invoice</th><th>Method / reference</th><th>Credited</th><th>Status</th><th></th></tr></thead><tbody>
+{% for p in page.object_list %}<tr><td data-label="Payment">{{ p.receipt_number|default:"—" }}<div class="muted small">{{ p.created_at|date:"d M Y, H:i" }}{% if p.source == 'client' %} · client report{% endif %}</div></td><td data-label="Invoice"><a href="{% url 'dashboard:invoice_detail' p.invoice_id %}">{{ p.invoice.number }}</a><div class="muted small">{{ p.invoice.client_name }}</div></td>
+<td data-label="Method">{{ p.method_label|default:"—" }}<div class="muted small">{{ p.reference|default:p.provider_txn_id|default:"no reference" }}</div></td><td data-label="Credited" class="nowrap">{{ p.amount|money:p.currency }}{% if p.received_currency %}<div class="muted small">received {{ p.received_currency }} {{ p.received_amount|default:"?" }}</div>{% endif %}</td>
+<td data-label="Status"><span class="badge {{ p.status|badge_class }}">{{ p.get_status_display }}</span></td><td class="nolabel"><a class="btn btn-sm {% if p.status == 'pending' and can_verify %}btn-primary{% endif %}" href="{% url 'dashboard:payment_detail' p.pk %}">{% if p.status == 'pending' and can_verify %}Verify{% else %}Open{% endif %}</a></td></tr>{% endfor %}</tbody></table></div>
+{% include "dashboard/_pagination.html" %}{% else %}<div class="empty">{% icon "check" 36 %}<h3>Nothing here</h3><p>{% if status == 'pending' %}No transfers are waiting for verification.{% else %}No payments match.{% endif %}</p></div>{% endif %}</div>
+{% endblock %}

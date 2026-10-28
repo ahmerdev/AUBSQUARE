@@ -1,0 +1,92 @@
+{% extends "dashboard/base.html" %}
+{% load static dash %}
+{% block content %}
+<div class="page-head"><div><h1>Media library</h1><p>Every image and document on your website. See the name, link, size and where a file is used — then copy, download or delete it. Files still in use are protected from deletion.</p></div></div>
+
+<div class="mstats">
+  <div class="card mstat"><span class="kicon kicon--soft">{% icon "image" 18 %}</span><div><b>{{ stats.total }}</b><span>Total files</span></div></div>
+  <div class="card mstat"><span class="kicon kicon--soft">{% icon "grid" 18 %}</span><div><b>{{ stats.images }}</b><span>Images</span></div></div>
+  <div class="card mstat"><span class="kicon kicon--soft">{% icon "doc" 18 %}</span><div><b>{{ stats.docs }}</b><span>Documents</span></div></div>
+  <div class="card mstat"><span class="kicon kicon--soft">{% icon "download" 18 %}</span><div><b>{{ stats.size|filesize }}</b><span>Storage used</span></div></div>
+</div>
+
+{% if can_upload %}<div class="card" style="margin-bottom:var(--gap)"><div class="dropzone" data-dropzone="page"><b>Drop files here or click to browse</b><div class="small" style="margin-top:6px">JPG, PNG, WebP, GIF, PDF, Office documents · up to {{ max_mb }} MB each</div><input type="file" multiple accept="image/jpeg,image/png,image/webp,image/gif,.pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt,.csv" hidden></div><div class="progress"><i></i></div></div>{% endif %}
+
+<div class="card card--flush" id="mlib" data-view="grid">
+  <form class="mtool" method="get">
+    <div class="search mtool__search">{% icon "search" 18 %}<input type="search" name="q" value="{{ q }}" placeholder="Search by name, link, title or alt text…" aria-label="Search media"></div>
+    <div class="seg" role="group" aria-label="File type">
+      <a class="segl {% if not kind %}on{% endif %}" href="?{% qs_replace qs kind='' page=1 %}">All</a>
+      <a class="segl {% if kind == 'image' %}on{% endif %}" href="?{% qs_replace qs kind='image' page=1 %}">Images</a>
+      <a class="segl {% if kind == 'document' %}on{% endif %}" href="?{% qs_replace qs kind='document' page=1 %}">Documents</a>
+    </div>
+    <select class="input mtool__sel" name="sort" onchange="this.form.submit()" aria-label="Sort">
+      <option value="new" {% if sort == 'new' %}selected{% endif %}>Newest first</option><option value="old" {% if sort == 'old' %}selected{% endif %}>Oldest first</option>
+      <option value="name" {% if sort == 'name' %}selected{% endif %}>Name A–Z</option><option value="big" {% if sort == 'big' %}selected{% endif %}>Largest first</option>
+      <option value="small" {% if sort == 'small' %}selected{% endif %}>Smallest first</option><option value="type" {% if sort == 'type' %}selected{% endif %}>Type</option>
+    </select>
+    <select class="input mtool__sel" name="per" onchange="this.form.submit()" aria-label="Files per page"><option value="24" {% if per == 24 %}selected{% endif %}>24 / page</option><option value="48" {% if per == 48 %}selected{% endif %}>48 / page</option><option value="96" {% if per == 96 %}selected{% endif %}>96 / page</option></select>
+    {% if kind %}<input type="hidden" name="kind" value="{{ kind }}">{% endif %}
+    <div class="seg seg--icons" role="group" aria-label="View"><button type="button" data-mview="grid" class="on" title="Grid view" aria-label="Grid view">{% icon "grid" 17 %}</button><button type="button" data-mview="list" title="List view" aria-label="List view">{% icon "menu" 17 %}</button></div>
+  </form>
+
+  <div class="mbulk" id="mbulk" hidden>
+    <b><span id="mbulk-n">0</span> selected</b>
+    <form method="post" action="{% url 'dashboard:media_bulk' %}" id="mbulk-form">{% csrf_token %}<input type="hidden" name="next" value="{{ request.get_full_path }}"><span id="mbulk-ids"></span>
+      <button class="btn btn-sm" type="submit" name="action" value="download">{% icon "download" 15 %} Download ZIP</button>
+      {% if can_delete %}<button class="btn btn-sm btn-danger" type="submit" name="action" value="delete" data-confirm="Delete the selected files? Files that are still used on the website are kept, and you'll be told how many." data-confirm-title="Delete selected files">{% icon "trash" 15 %} Delete</button>{% endif %}
+      <button class="btn btn-sm btn-ghost" type="button" id="mbulk-clear">Clear</button>
+    </form>
+  </div>
+
+  {% if page.object_list %}
+  <div class="mhead" aria-hidden="true"><label class="mrow__check"><input type="checkbox" class="check" id="mcheck-all" aria-label="Select all on this page"></label><span></span><span>Name</span><span>Link (URL)</span><span>Type</span><span>Size</span><span>Dimensions</span><span>Added</span><span></span></div>
+  <div class="mlist" id="mlist">{% for a in page.object_list %}
+    <article class="mrow" data-id="{{ a.pk }}" data-url="{{ a.url }}" data-name="{{ a }}" data-orig="{{ a.original_name }}" data-title="{{ a.title }}" data-alt="{{ a.alt_text }}" data-caption="{{ a.caption }}" data-kind="{{ a.kind }}" data-mime="{{ a.mime_type }}" data-size="{{ a.size|filesize }}" data-dim="{% if a.width %}{{ a.width }} × {{ a.height }} px{% endif %}" data-date="{{ a.created_at|date:'d M Y, H:i' }}" data-by="{% if a.uploaded_by %}{{ a.uploaded_by.display_name }}{% endif %}" data-download="{% url 'dashboard:media_download' a.pk %}" data-edit="{% url 'dashboard:media_edit' a.pk %}" data-delete="{% url 'dashboard:media_delete' a.pk %}" data-usage="{% url 'dashboard:media_usage' a.pk %}">
+      <label class="mrow__check"><input type="checkbox" class="check js-mcheck" value="{{ a.pk }}" aria-label="Select {{ a }}"></label>
+      <button type="button" class="mrow__thumb" data-details aria-label="Open details for {{ a }}">{% if a.kind == 'image' %}<img src="{{ a.url }}" alt="{{ a.alt_text }}" loading="lazy" decoding="async">{% else %}{% icon "doc" 34 %}<em>{{ a.ext }}</em>{% endif %}</button>
+      <div class="mrow__name"><button type="button" class="linkbtn" data-details title="{{ a }}">{{ a }}</button><span class="tiny muted">{{ a.original_name }}</span></div>
+      <div class="mrow__url"><code title="{{ a.url }}">{{ a.url }}</code></div>
+      <div class="mrow__type"><span class="extchip">{{ a.ext|default:"FILE" }}</span></div>
+      <div class="mrow__size">{{ a.size|filesize }}</div>
+      <div class="mrow__dim">{% if a.width %}{{ a.width }}×{{ a.height }}{% else %}—{% endif %}</div>
+      <div class="mrow__date">{{ a.created_at|date:"d M Y" }}<span class="tiny muted">{% if a.uploaded_by %}{{ a.uploaded_by.display_name }}{% endif %}</span></div>
+      <div class="mrow__actions">
+        <button type="button" class="iconbtn iconbtn--solid" data-copy="{{ a.url }}" title="Copy link" aria-label="Copy link">{% icon "link" 16 %}</button>
+        <a class="iconbtn iconbtn--solid" href="{% url 'dashboard:media_download' a.pk %}" title="Download" aria-label="Download {{ a }}">{% icon "download" 16 %}</a>
+        <button type="button" class="iconbtn iconbtn--solid" data-details title="Details" aria-label="Details">{% icon "eye" 16 %}</button>
+        {% if can_delete %}<form method="post" action="{% url 'dashboard:media_delete' a.pk %}">{% csrf_token %}<button class="iconbtn iconbtn--danger" type="submit" title="Delete" aria-label="Delete {{ a }}" data-confirm="Delete “{{ a }}”? If it's still used on the website you'll be told where." data-confirm-title="Delete file">{% icon "trash" 16 %}</button></form>{% endif %}
+      </div>
+    </article>{% endfor %}</div>
+  {% include "dashboard/_pagination.html" %}
+  {% else %}<div class="empty">{% icon "image" 36 %}<h3>{% if q or kind %}No files match{% else %}Your library is empty{% endif %}</h3><p>{% if q or kind %}Try a different search or clear the filter.{% else %}Upload images to use them in posts, services and the home page.{% endif %}</p></div>{% endif %}
+</div>
+
+<div class="modal" id="mdetail" role="dialog" aria-modal="true" aria-labelledby="md-title"><div class="modal__box modal__box--lg">
+  <div class="modal__head"><h3 id="md-title">File details</h3><button class="iconbtn" type="button" data-close-modal aria-label="Close">{% icon "x" 18 %}</button></div>
+  <div class="md">
+    <div class="md__preview" id="md-preview"></div>
+    <div class="md__side">
+      <dl class="md__facts"><dt>File name</dt><dd id="md-orig"></dd><dt>Type</dt><dd id="md-type"></dd><dt>Size</dt><dd id="md-size"></dd><dt id="md-dim-l">Dimensions</dt><dd id="md-dim"></dd><dt>Added</dt><dd id="md-date"></dd></dl>
+      <label class="lbl">Link (URL)</label>
+      <div class="inline-form"><input class="input mono" id="md-url" readonly aria-label="File link"><button class="btn btn-sm" type="button" id="md-copy">Copy link</button></div>
+      <div class="inline-form" style="margin-top:8px"><input class="input mono" id="md-full" readonly aria-label="Full web address"><button class="btn btn-sm" type="button" id="md-copy-full">Copy full address</button></div>
+      <div class="md__actions"><a class="btn btn-primary" id="md-download" href="#">{% icon "download" 16 %} Download</a><a class="btn" id="md-open" href="#" target="_blank" rel="noopener">{% icon "external" 16 %} Open</a></div>
+    </div>
+  </div>
+  <div class="md__usage" id="md-usage"><span class="muted small">Checking where this file is used…</span></div>
+  {% if can_edit %}<form method="post" id="md-form" class="md__form">{% csrf_token %}
+    <div class="fgrid">
+      <div class="field"><label class="lbl" for="md-f-title">Title (display name)</label><input class="input" id="md-f-title" name="title" maxlength="200"></div>
+      <div class="field"><label class="lbl" for="md-f-alt">Alt text</label><input class="input" id="md-f-alt" name="alt_text" maxlength="250"><div class="help">Describes the image for screen readers and SEO.</div></div>
+      <div class="field field--wide"><label class="lbl" for="md-f-cap">Caption</label><input class="input" id="md-f-cap" name="caption" maxlength="300"></div>
+    </div>
+    <button class="btn btn-primary" type="submit">Save details</button>
+  </form>{% endif %}
+  {% if can_delete %}<form method="post" id="md-del" class="md__del">{% csrf_token %}
+    <label class="md__force" id="md-force" hidden><input type="checkbox" class="check" name="force" value="1"> I understand — delete it even though it is used</label>
+    <button class="btn btn-danger" type="submit" data-confirm="Delete this file permanently? This cannot be undone." data-confirm-title="Delete file">{% icon "trash" 16 %} Delete file</button>
+  </form>{% endif %}
+</div></div>
+{% endblock %}
+{% block js %}<script src="{% static 'dashboard/media.js' %}"></script>{% endblock %}

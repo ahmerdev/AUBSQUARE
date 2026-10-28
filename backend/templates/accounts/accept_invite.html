@@ -1,0 +1,12 @@
+{% extends "accounts/base_auth.html" %}
+{% block title %}Accept invitation{% endblock %}
+{% block body %}
+<h1>Join AUB SQUARE</h1><p class="sub">You've been invited as <b>{{ invitation.role|default:"team member" }}</b> ({{ invitation.email }}). Choose a password to continue.</p>
+<form method="post" novalidate>{% csrf_token %}
+  {% if form.non_field_errors %}<div class="alert alert--bad" style="margin-bottom:14px">{{ form.non_field_errors.0 }}</div>{% endif %}
+  {% include "accounts/_field.html" with field=form.full_name %}
+  {% include "accounts/_field.html" with field=form.password1 %}
+  {% include "accounts/_field.html" with field=form.password2 %}
+  <button class="btn btn-primary btn-block" type="submit">Create my account</button>
+</form>
+{% endblock %}

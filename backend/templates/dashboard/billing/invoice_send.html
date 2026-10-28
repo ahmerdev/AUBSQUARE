@@ -1,0 +1,16 @@
+{% extends "dashboard/base.html" %}
+{% load dash %}
+{% block content %}
+<form method="post">{% csrf_token %}<input type="hidden" name="do" value="send"><input type="hidden" name="kind" value="{{ kind }}">{% if payment %}<input type="hidden" name="payment" value="{{ payment.pk }}">{% endif %}
+<div class="page-head"><div><h1>Send {{ inv.number }}</h1><p>Review the email exactly as it will be sent. Nothing is sent until you press <b>Send email</b>.</p></div><div class="actions"><a class="btn" href="{% url 'dashboard:invoice_detail' inv.pk %}">Back</a><button class="btn btn-primary">{% icon "send" 16 %} Send email</button></div></div>
+<div class="grid g2" style="align-items:start"><section class="card"><div class="card__head"><h2>Email</h2></div><div class="fgrid">
+<div class="field field--wide"><label class="lbl">Template</label><div class="tabs">{% for k, l in kinds.items %}<a href="?kind={{ k }}" class="{% if kind == k %}active{% endif %}">{{ l }}</a>{% endfor %}</div></div>
+<div class="field field--wide"><label class="lbl">To</label><input class="input" name="to" value="{{ to }}" type="email" required></div>
+<div class="field field--wide"><label class="lbl">Subject</label><input class="input" name="subject" value="{{ subject }}" maxlength="300"></div>
+<div class="field field--wide"><label class="lbl">Message</label><textarea class="input" name="body" rows="16">{{ body }}</textarea></div></div></section>
+<div class="stack"><section class="card"><div class="card__head"><h2>Attachments</h2></div>
+{% if has_pdf %}<label style="display:flex;gap:8px;align-items:flex-start;margin-bottom:12px"><input type="checkbox" name="attach_pdf" value="1" {% if default_pdf %}checked{% endif %}><span><b>{% if kind == 'payment_received' %}Receipt PDF{% else %}Invoice PDF{% endif %}</b> attached to the email (generated from the saved invoice).</span></label>{% else %}<p class="muted small">This email type has no automatic PDF.</p>{% endif %}
+<div class="field"><label class="lbl">Company profile</label>{% if doc %}<select class="input" name="profile_mode"><option value="none">Don't include it (default)</option><option value="attach">Attach the PDF – {{ doc.filename }}</option><option value="link">Include a secure link (not attached)</option></select>
+<div class="help">Version {{ doc.version }} from your Media library. Selecting it is not the same as sending it – it goes out only if you choose Attach or Link here.</div>{% else %}<div class="muted small">No profile PDF selected yet. <a href="{% url 'dashboard:company_profile' %}">Choose one</a> (optional).</div><input type="hidden" name="profile_mode" value="none">{% endif %}</div></section>
+<section class="card"><div class="card__head"><h2>Before you send</h2></div><ul class="list"><li>Sent through your own SMTP settings – the status afterwards shows <i>Accepted by mail server</i> only when it is accepted.</li><li>Payment reminders are blocked automatically for paid, closed or disputed invoices.</li><li>The invoice page link in the email always works; the “Pay online” button appears there only when a gateway is truly configured.</li></ul></section></div></div></form>
+{% endblock %}

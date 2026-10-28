@@ -1,0 +1,17 @@
+{% extends "dashboard/base.html" %}
+{% load dash %}
+{% block content %}
+<div class="page-head"><div><h1>{{ m.subject|truncatechars:90 }}</h1><p><span class="badge {{ m.status|badge_class }}">{{ m.get_status_display }}</span> · {{ m.get_kind_display }} · {{ m.created_at|date:"d M Y, H:i" }}</p></div>
+  <div class="actions">{% if m.direction == 'out' and m.status != 'sent' and can_retry %}<form method="post" action="{% url 'dashboard:message_retry' m.pk %}">{% csrf_token %}<button class="btn btn-primary" type="submit">{% icon "refresh" 16 %} Retry sending</button></form>{% endif %}
+    {% if m.thread %}<a class="btn" href="{% url 'dashboard:thread' m.thread_id %}">Open thread</a>{% endif %}<a class="btn" href="{% url 'dashboard:inbox' %}">← Inbox</a></div></div>
+<div class="grid g-form">
+  <section class="card">
+    {% if m.body_html %}<iframe class="mailframe" sandbox srcdoc="{{ m.body_html }}" title="Email body"></iframe>{% else %}<div style="white-space:pre-wrap;overflow-wrap:anywhere">{{ m.body_text }}</div>{% endif %}
+  </section>
+  <aside class="stack"><section class="card"><dl class="kv" style="grid-template-columns:90px 1fr">
+    <dt>From</dt><dd>{{ m.from_name }} &lt;{{ m.from_email }}&gt;</dd><dt>To</dt><dd>{{ m.to_emails|join:", " }}</dd>{% if m.cc_emails %}<dt>Cc</dt><dd>{{ m.cc_emails|join:", " }}</dd>{% endif %}
+    <dt>Attempts</dt><dd>{{ m.attempts }}</dd>{% if m.sent_at %}<dt>Sent</dt><dd>{{ m.sent_at|date:"d M Y, H:i" }}</dd>{% endif %}{% if m.lead %}<dt>Lead</dt><dd><a href="{% url 'dashboard:lead_detail' m.lead_id %}">{{ m.lead.reference }}</a></dd>{% endif %}
+  </dl></section>
+  {% if m.error %}<section class="alert alert--bad"><div><b>Delivery error</b><div class="small" style="margin-top:4px;overflow-wrap:anywhere">{{ m.error }}</div>{% if m.next_attempt_at %}<div class="small muted" style="margin-top:6px">Next automatic retry: {{ m.next_attempt_at|date:"d M, H:i" }}</div>{% endif %}</div></section>{% endif %}</aside>
+</div>
+{% endblock %}

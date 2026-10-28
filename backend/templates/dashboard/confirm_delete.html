@@ -1,0 +1,14 @@
+{% extends "dashboard/base.html" %}
+{% load dash %}
+{% block content %}
+<div class="card" style="max-width:640px;margin:20px auto">
+  <h1 style="font-size:22px">Delete this {{ m.singular }}?</h1>
+  <p class="muted" style="margin-top:8px"><b>{{ obj }}</b> will be permanently removed. This can't be undone.</p>
+  {% if protected %}<div class="alert alert--bad" style="margin:14px 0">{% icon "alert" 18 %}<div>It can't be deleted because other records depend on it:<ul>{% for p in protected %}<li>{{ p }}</li>{% endfor %}</ul></div></div>{% endif %}
+  {% if related %}<div class="alert alert--warn" style="margin:14px 0">{% icon "alert" 18 %}<div>Deleting also removes or detaches:<ul style="margin:6px 0 0;padding-left:18px">{% for r in related %}<li>{{ r }}</li>{% endfor %}</ul></div></div>{% endif %}
+  <form method="post" class="actions" style="margin-top:18px">{% csrf_token %}
+    {% if not protected %}<button class="btn btn-danger" type="submit">{% icon "trash" 16 %} Yes, delete</button>{% endif %}
+    <a class="btn" href="{% url 'dashboard:edit' m.slug obj.pk %}">Cancel</a>
+  </form>
+</div>
+{% endblock %}

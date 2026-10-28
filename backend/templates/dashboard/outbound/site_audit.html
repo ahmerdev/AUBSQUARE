@@ -1,0 +1,9 @@
+{% extends "dashboard/base.html" %}
+{% load dash %}
+{% block content %}
+<div class="page-head"><div><h1>Site audit</h1><p>Check any page of our own website the same way we audit prospects: HTTPS, mobile, titles, descriptions, WhatsApp, contact form and broken links.</p></div></div>
+{% if can_run %}<section class="card" style="margin-bottom:16px"><form method="post" class="row-actions">{% csrf_token %}<input class="input" name="url" value="{{ default_url }}" placeholder="https://yourwebsite.com" style="flex:1" required><button class="btn btn-primary" data-busy="Auditing…">{% icon "search" 16 %} Run audit</button></form>
+  <p class="help" style="margin-top:8px">Only public websites can be checked. Results are real measurements of the page's HTML – nothing is estimated.</p></section>{% endif %}
+{% if audit %}<section class="card" style="margin-bottom:16px">{% include "dashboard/outbound/_audit.html" %}</section>{% endif %}
+{% if history|length > 1 %}<section class="card"><div class="card__head"><h3>Previous audits</h3></div><ul class="list">{% for a in history %}<li><div class="grow">{{ a.url|truncatechars:70 }}<div class="muted small">{{ a.created_at|date:"d M Y, H:i" }}</div></div><span class="badge {{ a.level|badge_class }}">{% if a.reachable %}{{ a.score }}{% else %}failed{% endif %}</span></li>{% endfor %}</ul></section>{% endif %}
+{% endblock %}

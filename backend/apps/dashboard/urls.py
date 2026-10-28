@@ -1,0 +1,157 @@
+from django.urls import path
+
+from . import crud, views_content as vc, views_core as core, views_customers as cu, views_marketing as mk, views_seo as seo, views_users as us, views_brand as brand, views_outbound as ob, views_proposals as pp, views_billing as bl
+
+app_name = "dashboard"
+
+urlpatterns = [
+    path("", core.home, name="home"),
+    path("search/", core.search, name="search"),
+    path("notifications/", core.notifications, name="notifications"),
+    path("notifications/feed/", core.notifications_feed, name="notifications_feed"),
+    path("notifications/read/", core.notification_read, name="notifications_read_all"),
+    path("notifications/<int:pk>/read/", core.notification_read, name="notification_read"),
+    path("activity/", core.activity, name="activity"),
+    path("activity/export/", core.activity_export, name="activity_export"),
+    path("analytics/", core.analytics, name="analytics"),
+    path("analytics/export/", core.analytics_export, name="analytics_export"),
+
+    # home builder & media
+    path("home-builder/", vc.home_builder, name="home_builder"),
+    path("media/", vc.media_library, name="media"),
+    path("media/picker/", vc.media_picker, name="media_picker"),
+    path("media/upload/", vc.media_upload, name="media_upload"),
+    path("media/<int:pk>/edit/", vc.media_edit, name="media_edit"),
+    path("media/<int:pk>/usage/", vc.media_usage_json, name="media_usage"),
+    path("media/<int:pk>/delete/", vc.media_delete, name="media_delete"),
+    path("media/<int:pk>/download/", vc.media_download, name="media_download"),
+    path("media/bulk/", vc.media_bulk, name="media_bulk"),
+
+    # leads
+    path("leads/", cu.leads_list, name="leads"),
+    path("leads/new/", cu.lead_create, name="lead_create"),
+    path("leads/export/", cu.leads_export, name="leads_export"),
+    path("leads/bulk/", cu.leads_bulk, name="leads_bulk"),
+    path("leads/<int:pk>/", cu.lead_detail, name="lead_detail"),
+    path("leads/<int:pk>/update/", cu.lead_update, name="lead_update"),
+    path("leads/<int:pk>/reply/", cu.lead_reply, name="lead_reply"),
+    path("leads/<int:pk>/delete/", cu.lead_delete, name="lead_delete"),
+
+    # comments
+    path("comments/", cu.comments_list, name="comments"),
+    path("comments/<int:pk>/action/", cu.comment_action, name="comment_action"),
+    path("comments/<int:pk>/delete/", cu.comment_delete, name="comment_delete"),
+
+    # chat
+    path("chat/", cu.chat_list, name="chat"),
+    path("chat/<int:pk>/", cu.chat_detail, name="chat_detail"),
+    path("chat/<int:pk>/poll/", cu.chat_poll, name="chat_poll"),
+    path("chat/<int:pk>/reply/", cu.chat_reply, name="chat_reply"),
+    path("chat/<int:pk>/action/", cu.chat_action, name="chat_action"),
+    path("chat/<int:pk>/delete/", cu.chat_delete, name="chat_delete"),
+
+    # email
+    path("inbox/", cu.inbox, name="inbox"),
+    path("inbox/compose/", cu.compose, name="compose"),
+    path("inbox/sync/", cu.inbox_sync, name="inbox_sync"),
+    path("inbox/process/", cu.outbox_process, name="outbox_process"),
+    path("inbox/thread/<int:pk>/", cu.thread_detail, name="thread"),
+    path("inbox/thread/<int:pk>/reply/", cu.thread_reply, name="thread_reply"),
+    path("inbox/message/<int:pk>/", cu.message_detail, name="message"),
+    path("inbox/message/<int:pk>/retry/", cu.message_retry, name="message_retry"),
+    path("email-settings/", cu.email_settings, name="email_settings"),
+    path("email-settings/test/", cu.email_test, name="email_test"),
+    path("email-settings/imap-test/", cu.imap_test, name="imap_test"),
+
+    # SEO
+    path("seo/", seo.seo_overview, name="seo"),
+    path("branding/", brand.branding, name="branding"),
+    path("seo/sitemap/", seo.sitemap_preview, name="sitemap_preview"),
+    path("backlinks/<int:pk>/verify/", seo.backlink_verify, name="backlink_verify"),
+
+    # marketing & ads
+    path("campaigns/<int:pk>/overview/", mk.campaign_detail, name="campaign_detail"),
+    path("campaigns/<int:pk>/action/", mk.campaign_action, name="campaign_action"),
+    path("campaign-metrics/<int:pk>/delete/", mk.metric_delete, name="metric_delete"),
+    path("email-campaigns/<int:pk>/send/", mk.email_campaign_send, name="email_campaign_send"),
+    path("subscribers/import/", mk.subscribers_import, name="subscribers_import"),
+    path("ads/", mk.ads_overview, name="ads"),
+    path("ad-creatives/<int:pk>/action/", mk.creative_action, name="creative_action"),
+
+    # outbound sales
+    path("outbound/", ob.overview, name="outbound"),
+    path("outbound/run-checks/", ob.run_checks, name="outbound_run_checks"),
+    path("prospects/", ob.prospects_list, name="prospects"),
+    path("prospects/new/", ob.prospect_new, name="prospect_new"),
+    path("prospects/discover/", ob.prospects_discover, name="prospects_discover"),
+    path("prospects/import/", ob.prospects_import, name="prospects_import"),
+    path("prospects/bulk/", ob.prospects_bulk, name="prospects_bulk"),
+    path("prospects/export/", ob.prospects_export, name="prospects_export"),
+    path("prospects/<int:pk>/", ob.prospect_detail, name="prospect_detail"),
+    path("prospects/<int:pk>/action/", ob.prospect_action, name="prospect_action"),
+    path("prospects/<int:pk>/report/", ob.prospect_report, name="prospect_report"),
+    path("prospects/<int:pk>/delete/", ob.prospect_delete, name="prospect_delete"),
+    path("seo/site-audit/", ob.site_audit, name="site_audit"),
+    path("pipeline/", ob.pipeline, name="pipeline"),
+    path("pipeline/move/", ob.pipeline_move, name="pipeline_move"),
+    path("outreach/", ob.outreach_queue, name="outreach"),
+    path("outreach/bulk/", ob.outreach_bulk, name="outreach_bulk"),
+    path("outreach/<int:pk>/action/", ob.outreach_action, name="outreach_action"),
+    path("sequences/", ob.sequences, name="sequences"),
+    path("sequences/new/", ob.sequence_edit, name="sequence_new"),
+    path("sequences/<int:pk>/", ob.sequence_edit, name="sequence_edit"),
+    path("sequences/<int:pk>/delete/", ob.sequence_delete, name="sequence_delete"),
+    path("proposals/", pp.proposals_list, name="proposals"),
+    path("proposals/new/", pp.proposal_new, name="proposal_new"),
+    path("proposals/<int:pk>/", pp.proposal_detail, name="proposal_detail"),
+    path("proposals/<int:pk>/edit/", pp.proposal_edit, name="proposal_edit"),
+    path("proposals/<int:pk>/action/", pp.proposal_action, name="proposal_action"),
+    path("proposals/<int:pk>/delete/", pp.proposal_delete, name="proposal_delete"),
+    path("proposals/<int:pk>/invoice/", bl.proposal_to_invoice, name="proposal_invoice"),
+
+    # billing
+    path("invoices/", bl.invoices_list, name="invoices"),
+    path("invoices/new/", bl.invoice_new, name="invoice_new"),
+    path("invoices/export/", bl.invoices_export, name="invoices_export"),
+    path("invoices/<int:pk>/", bl.invoice_detail, name="invoice_detail"),
+    path("invoices/<int:pk>/edit/", bl.invoice_edit, name="invoice_edit"),
+    path("invoices/<int:pk>/pdf/", bl.invoice_pdf_view, name="invoice_pdf"),
+    path("invoices/<int:pk>/action/", bl.invoice_action, name="invoice_action"),
+    path("invoices/<int:pk>/send/", bl.invoice_send, name="invoice_send"),
+    path("invoices/<int:pk>/payment/", bl.invoice_payment, name="invoice_payment"),
+    path("payments/", bl.payments_list, name="payments"),
+    path("payments/export/", bl.payments_export, name="payments_export"),
+    path("payments/<int:pk>/", bl.payment_detail, name="payment_detail"),
+    path("payments/<int:pk>/action/", bl.payment_action, name="payment_action"),
+    path("payments/<int:pk>/receipt/", bl.receipt_pdf_view, name="receipt_pdf"),
+    path("billing/reports/", bl.billing_reports, name="billing_reports"),
+    path("billing/settings/", bl.billing_settings, name="billing_settings"),
+    path("billing/methods/", bl.methods_list, name="billing_methods"),
+    path("billing/methods/new/", bl.method_edit, name="billing_method_new"),
+    path("billing/methods/<int:pk>/", bl.method_edit, name="billing_method_edit"),
+    path("billing/methods/<int:pk>/delete/", bl.method_delete, name="billing_method_delete"),
+    path("billing/profile/", bl.company_profile, name="company_profile"),
+    path("billing/profile/<int:pk>/file/", bl.company_profile_download, name="company_profile_file"),
+    path("outbound-settings/", ob.outbound_settings, name="outbound_settings"),
+    path("sales-reports/", ob.sales_reports, name="sales_reports"),
+
+    # users & roles
+    path("users/", us.users_list, name="users"),
+    path("users/invite/", us.invite_user, name="invite"),
+    path("users/invitations/<int:pk>/revoke/", us.invite_revoke, name="invite_revoke"),
+    path("users/<int:pk>/", us.user_detail, name="user_detail"),
+    path("users/<int:pk>/action/", us.user_action, name="user_action"),
+    path("roles/", us.roles_list, name="roles"),
+    path("roles/new/", us.role_edit, name="role_create"),
+    path("roles/<int:pk>/", us.role_edit, name="role_edit"),
+    path("roles/<int:pk>/delete/", us.role_delete, name="role_delete"),
+
+    # generic registry-driven CRUD (must stay last)
+    path("<slug:mslug>/", crud.list_view, name="list"),
+    path("<slug:mslug>/new/", crud.create_view, name="create"),
+    path("<slug:mslug>/export/", crud.export_view, name="export"),
+    path("<slug:mslug>/bulk/", crud.bulk_view, name="bulk"),
+    path("<slug:mslug>/<int:pk>/", crud.edit_view, name="edit"),
+    path("<slug:mslug>/<int:pk>/view/", crud.detail_view, name="detail"),
+    path("<slug:mslug>/<int:pk>/delete/", crud.delete_view, name="delete"),
+]

@@ -1,0 +1,25 @@
+{% extends "dashboard/base.html" %}
+{% load dash %}
+{% block content %}
+<form method="post" novalidate data-warn-unsaved>{% csrf_token %}
+<div class="page-head"><div><h1>{% if pr %}Edit {{ pr.reference }}{% else %}New proposal{% endif %}</h1><p>{% if lead %}For lead {{ lead.reference }} – {{ lead.name }}.{% elif prospect %}For prospect {{ prospect.business_name }}.{% else %}Prices are entered by you; services are only a shortcut for the line text.{% endif %}</p></div>
+  <div class="actions"><a class="btn" href="{% url 'dashboard:proposals' %}">Cancel</a><button class="btn btn-primary" type="submit">Save proposal</button></div></div>
+{% if form.non_field_errors %}<div class="alert alert--bad" style="margin-bottom:16px">{{ form.non_field_errors }}</div>{% endif %}
+<section class="card" style="margin-bottom:16px"><div class="card__head"><h2>Client</h2></div><div class="fgrid">
+{% for f in form %}{% if f.name in 'title,client_name,client_company,client_email,client_website,valid_until,currency' %}<div class="field {% if f.errors %}has-error{% endif %}"><label class="lbl" for="{{ f.id_for_label }}">{{ f.label }}</label>{{ f }}{{ f.errors }}</div>{% endif %}{% endfor %}</div></section>
+<section class="card" style="margin-bottom:16px"><div class="card__head"><h2>Line items</h2><button class="btn btn-sm" type="button" id="additem">{% icon "plus" 14 %} Add line</button></div>
+  <div id="items">{% for it in items %}<div class="itemrow"><select class="input" name="item_service" data-svc><option value="">Service (optional)</option>{% for s in services %}<option value="{{ s.pk }}" data-title="{{ s.title }}" data-desc="{{ s.short_description|truncatechars:240 }}" {% if it.service and it.service.pk == s.pk %}selected{% endif %}>{{ s.title }}</option>{% endfor %}</select>
+    <input class="input" name="item_desc" value="{{ it.description }}" placeholder="What you will deliver" required><input class="input" name="item_detail" value="{{ it.detail }}" placeholder="Details (optional)">
+    <input class="input" name="item_qty" value="{{ it.quantity|floatformat:'-2' }}" type="number" step="0.01" min="0" placeholder="Qty"><input class="input" name="item_price" value="{{ it.unit_price|floatformat:'-2' }}" type="number" step="0.01" min="0" placeholder="Unit price"><button class="btn btn-sm btn-danger" type="button" data-remove>×</button></div>{% endfor %}</div>
+  <template id="itemtpl"><div class="itemrow"><select class="input" name="item_service" data-svc><option value="">Service (optional)</option>{% for s in services %}<option value="{{ s.pk }}" data-title="{{ s.title }}" data-desc="{{ s.short_description|truncatechars:240 }}">{{ s.title }}</option>{% endfor %}</select>
+    <input class="input" name="item_desc" placeholder="What you will deliver" required><input class="input" name="item_detail" placeholder="Details (optional)"><input class="input" name="item_qty" value="1" type="number" step="0.01" min="0" placeholder="Qty"><input class="input" name="item_price" value="0" type="number" step="0.01" min="0" placeholder="Unit price"><button class="btn btn-sm btn-danger" type="button" data-remove>×</button></div></template>
+  <div class="fgrid" style="margin-top:14px">{% for f in form %}{% if f.name in 'discount,tax_percent' %}<div class="field {% if f.errors %}has-error{% endif %}"><label class="lbl" for="{{ f.id_for_label }}">{{ f.label }}</label>{{ f }}{{ f.errors }}</div>{% endif %}{% endfor %}</div></section>
+<section class="card" style="margin-bottom:16px"><div class="card__head"><h2>Message</h2></div><div class="fgrid">{% for f in form %}{% if f.name in 'intro,scope,terms' %}<div class="field field--wide"><label class="lbl" for="{{ f.id_for_label }}">{{ f.label }}</label>{{ f }}{{ f.errors }}</div>{% endif %}{% endfor %}</div></section>
+<section class="card"><div class="card__head"><h2>Proof of work (from your website)</h2></div><div class="fgrid">{% for f in form %}{% if f.name in 'show_portfolio,show_case_studies,show_testimonials' %}<div class="field"><label class="lbl" for="{{ f.id_for_label }}">{{ f.label }}</label>{{ f }}<div class="help">{{ f.help_text }}</div></div>{% endif %}{% endfor %}</div></section>
+</form>
+<script>(function(){var box=document.getElementById("items"),tpl=document.getElementById("itemtpl");
+document.getElementById("additem").addEventListener("click",function(){box.appendChild(tpl.content.cloneNode(true));});
+box.addEventListener("click",function(e){var b=e.target.closest("[data-remove]");if(b)b.closest(".itemrow").remove();});
+box.addEventListener("change",function(e){var s=e.target.closest("[data-svc]");if(!s)return;var o=s.options[s.selectedIndex],row=s.closest(".itemrow"),d=row.querySelector("[name=item_desc]");if(o&&o.value&&!d.value){d.value=o.dataset.title;row.querySelector("[name=item_detail]").value=o.dataset.desc||"";}});
+if(!box.children.length)box.appendChild(tpl.content.cloneNode(true));})();</script>
+{% endblock %}

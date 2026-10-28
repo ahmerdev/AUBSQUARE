@@ -1,0 +1,18 @@
+{% extends "dashboard/base.html" %}
+{% load dash %}
+{% block content %}
+<div class="page-head"><div><h1>My profile</h1><p>Update your details and password. Your role and approval status are managed by a Super Admin.</p></div></div>
+<div class="grid g2">
+  <form method="post" class="card" novalidate>{% csrf_token %}<input type="hidden" name="form" value="profile">
+    <div class="card__head"><h2>Details</h2></div>
+    <dl class="kv" style="margin-bottom:14px"><dt>Email</dt><dd>{{ request.user.email }}</dd><dt>Role</dt><dd>{% if request.user.is_superuser %}Super Admin{% else %}{{ request.user.role|default:"—" }}{% endif %}</dd></dl>
+    {{ pform.non_field_errors }}
+    {% for f in pform %}{% if f.name == 'notify_email' %}<div class="field field--check">{{ f }}<div><label for="{{ f.id_for_label }}">Email me important notifications</label></div></div>{% else %}<div class="field {% if f.errors %}has-error{% endif %}"><label class="lbl" for="{{ f.id_for_label }}">{{ f.label }}</label>{{ f }}{{ f.errors }}</div>{% endif %}{% endfor %}
+    <button class="btn btn-primary" type="submit">Save profile</button></form>
+  <form method="post" class="card" novalidate>{% csrf_token %}<input type="hidden" name="form" value="password">
+    <div class="card__head"><h2>Change password</h2></div>{{ cform.non_field_errors }}
+    {% for f in cform %}<div class="field {% if f.errors %}has-error{% endif %}"><label class="lbl" for="{{ f.id_for_label }}">{{ f.label }}</label>{{ f }}{{ f.errors }}</div>{% endfor %}
+    <p class="help">Use at least 10 characters. Other devices stay signed in unless you also use “sign out of all devices” (ask a Super Admin).</p>
+    <button class="btn btn-primary" type="submit">Change password</button></form>
+</div>
+{% endblock %}

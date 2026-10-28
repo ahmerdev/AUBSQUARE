@@ -1,0 +1,24 @@
+{% extends "dashboard/base.html" %}
+{% load dash %}
+{% block content %}
+<div class="page-head"><div><h1>Invoices</h1><p>Draft, issue and send invoices, record payments and see who still owes you. Issued invoices are never silently changed.</p></div>
+  <div class="actions">{% if pending %}<a class="btn" href="{% url 'dashboard:payments' %}">{% icon "bolt" 16 %} {{ pending }} payment{{ pending|pluralize }} to verify</a>{% endif %}
+    {% if can_export %}<a class="btn" href="{% url 'dashboard:invoices_export' %}?{{ qs }}">{% icon "download" 16 %} Export CSV</a>{% endif %}
+    {% if can_create %}<a class="btn btn-primary" href="{% url 'dashboard:invoice_new' %}">{% icon "plus" 16 %} New invoice</a>{% endif %}</div></div>
+{% if outstanding %}<div class="grid g4" style="margin-bottom:16px">{% for cur, out, over in outstanding %}<div class="card stat"><div class="stat__label">Outstanding ({{ cur }})</div><div class="stat__value" style="font-size:30px">{{ out|money:cur }}</div><div class="stat__foot">{% if over %}<span class="badge b-bad">{{ over|money:cur }} overdue</span>{% else %}nothing overdue{% endif %}</div></div>{% endfor %}</div>{% endif %}
+<div style="margin-bottom:14px"><div class="tabs"><a href="?" class="{% if not g.status %}active{% endif %}">All <span class="n">{{ total }}</span></a>
+{% for k, l in statuses %}<a href="?status={{ k }}" class="{% if g.status == k %}active{% endif %}">{{ l }} <span class="n">{{ counts|get_item:k|default:0 }}</span></a>{% endfor %}<a href="?status=overdue" class="{% if g.status == 'overdue' %}active{% endif %}">Overdue</a></div></div>
+<div class="card card--flush"><form class="toolbar" method="get" style="flex-wrap:wrap;gap:8px">
+  <div class="grow" style="min-width:180px"><input class="input" type="search" name="q" value="{{ g.q }}" placeholder="Invoice no., project, client…"></div>
+  <input class="input" style="max-width:170px" name="client" value="{{ g.client }}" placeholder="Client / email">
+  <select class="input" style="max-width:110px" name="currency"><option value="">Currency</option>{% for c in currencies %}<option {% if g.currency == c %}selected{% endif %}>{{ c }}</option>{% endfor %}</select>
+  <select class="input" style="max-width:190px" name="method"><option value="">Payment method</option>{% for k, l in kinds %}<option value="{{ k }}" {% if g.method == k %}selected{% endif %}>{{ l }}</option>{% endfor %}</select>
+  <input class="input" style="max-width:150px" type="date" name="from" value="{{ g.from }}" title="From date"><input class="input" style="max-width:150px" type="date" name="to" value="{{ g.to }}" title="To date">
+  {% if g.status %}<input type="hidden" name="status" value="{{ g.status }}">{% endif %}<button class="btn btn-sm">Filter</button>{% if qs %}<a class="btn btn-sm btn-ghost" href="?">Clear</a>{% endif %}</form>
+{% if page.object_list %}<div class="table-wrap"><table class="t table--stack"><thead><tr><th>Invoice</th><th>Client</th><th>Issued</th><th>Due</th><th>Total</th><th>Balance</th><th>Status</th><th></th></tr></thead><tbody>
+{% for i in page.object_list %}<tr><td class="title" data-label="Invoice"><a href="{% url 'dashboard:invoice_detail' i.pk %}">{{ i.number|default:"Draft" }}</a><div class="muted small">{{ i.project_name|truncatechars:34 }}</div></td>
+<td data-label="Client">{{ i.client_name }}<div class="muted small">{{ i.client_company }}</div></td><td data-label="Issued">{{ i.issue_date|date:"d M Y"|default:"—" }}</td><td data-label="Due">{{ i.due_date|date:"d M Y"|default:"—" }}{% if i.is_overdue %}<div class="small" style="color:var(--bad)">{{ i.days_overdue }}d late</div>{% endif %}</td>
+<td data-label="Total" class="nowrap">{{ i.total|money:i.currency }}</td><td data-label="Balance" class="nowrap">{% if i.status in 'issued,sent,partially_paid' %}{{ i.balance|money:i.currency }}{% else %}<span class="muted">—</span>{% endif %}</td>
+<td data-label="Status"><span class="badge {{ i.display_status|badge_class }}">{{ i.display_status_label }}</span>{% if i.in_dispute %} <span class="badge b-warn">disputed</span>{% endif %}</td><td class="nolabel"><a class="btn btn-sm" href="{% url 'dashboard:invoice_detail' i.pk %}">Open</a></td></tr>{% endfor %}</tbody></table></div>
+{% include "dashboard/_pagination.html" %}{% else %}<div class="empty">{% icon "doc" 36 %}<h3>No invoices found</h3><p>Create a draft, or convert a won proposal into an invoice.</p></div>{% endif %}</div>
+{% endblock %}

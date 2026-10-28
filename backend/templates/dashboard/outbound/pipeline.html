@@ -1,0 +1,36 @@
+{% extends "dashboard/base.html" %}
+{% load dash %}
+{% block content %}
+<div class="page-head"><div><h1>Pipeline board</h1><p>Every opportunity in one place – website enquiries, design leads, outbound prospects. {% if can_move %}Drag a card to change its stage.{% endif %}</p></div>
+  <div class="actions"><a class="btn" href="{% url 'dashboard:leads' %}">List view</a><a class="btn btn-primary" href="{% url 'dashboard:lead_create' %}">{% icon "plus" 16 %} Add lead</a></div></div>
+<div class="row-actions" style="margin-bottom:12px;flex-wrap:wrap;gap:12px">
+  <div class="tabs"><a href="?board=leads" class="{% if mode == 'leads' %}active{% endif %}">Leads</a>{% if can_outbound %}<a href="?board=prospects" class="{% if mode == 'prospects' %}active{% endif %}">Outbound prospects</a>{% endif %}</div>
+  <div class="tabs">{% for key, label, n in cats %}<a href="?board={{ mode }}&category={{ key }}{% if g.source %}&source={{ g.source }}{% endif %}" class="{% if g.category|default:'' == key %}active{% endif %}">{{ label }} <span class="n">{{ n }}</span></a>{% endfor %}</div>
+  {% if mode == 'leads' %}<form method="get" class="row-actions"><input type="hidden" name="board" value="leads"><input type="hidden" name="category" value="{{ g.category }}"><select class="input" name="source" onchange="this.form.submit()" style="width:auto"><option value="">All sources</option>{% for k, l in sources %}<option value="{{ k }}" {% if g.source == k %}selected{% endif %}>{{ l }}</option>{% endfor %}</select>
+    <select class="input" name="assigned" onchange="this.form.submit()" style="width:auto"><option value="">Everyone's</option><option value="me" {% if g.assigned == 'me' %}selected{% endif %}>Mine</option></select></form>{% endif %}
+</div>
+<div class="kanban" data-kind="{% if mode == 'leads' %}lead{% else %}prospect{% endif %}" data-move="{% url 'dashboard:pipeline_move' %}" data-can="{{ can_move|yesno:'1,0' }}">
+{% for col in cols %}
+  <section class="kcol" data-col="{{ col.key }}"><header><span class="badge {{ col.key|badge_class }}">{{ col.label }}</span><b class="kcount">{{ col.count }}</b></header>
+    <div class="kcards" data-drop>
+    {% for it in col.items %}
+      <article class="kcard" {% if can_move %}draggable="true"{% endif %} data-id="{{ it.pk }}">
+        {% if mode == 'leads' %}
+          <a class="ktitle" href="{% url 'dashboard:lead_detail' it.pk %}">{{ it.name }}</a>
+          <div class="muted small">{{ it.service_label|default:"No service chosen" }}</div>
+          <div class="kmeta"><span class="badge b-muted">{{ it.get_category_display }}</span>{% if it.source == 'outbound' %}<span class="badge b-info">Outbound</span>{% elif it.source == 'audit_tool' %}<span class="badge b-info">Free audit</span>{% endif %}
+            {% if it.status == 'new' and not it.first_response_at %}<span class="badge b-bad" title="No reply yet">{% icon "clock" 12 %} {{ it.created_at|timesince }}</span>{% elif it.follow_up_overdue %}<span class="badge b-warn">Follow-up due</span>{% endif %}</div>
+          <div class="muted small">{{ it.budget_label|default:"" }}{% if it.assigned_to %} · {{ it.assigned_to.display_name }}{% endif %}</div>
+        {% else %}
+          <a class="ktitle" href="{% url 'dashboard:prospect_detail' it.pk %}">{{ it.business_name }}</a>
+          <div class="muted small">{{ it.get_category_display }}{% if it.city %} · {{ it.city }}{% endif %}</div>
+          <div class="kmeta">{% if it.opportunity_level != 'unknown' %}<span class="badge {{ it.opportunity_level|badge_class }}">{{ it.opportunity_score }} · {{ it.get_opportunity_level_display }}</span>{% endif %}{% if it.email %}<span class="badge b-muted">email</span>{% endif %}</div>
+        {% endif %}
+      </article>
+    {% empty %}<p class="muted small kempty">Nothing here.</p>{% endfor %}
+    </div>
+  </section>
+{% endfor %}
+</div>
+{% if mode == 'leads' %}<p class="muted small" style="margin-top:10px">Won and Lost columns show the last 45 days. Cards moved out of “New” are counted as first reply for response-time reports.</p>{% endif %}
+{% endblock %}

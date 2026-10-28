@@ -1,0 +1,16 @@
+{% extends "dashboard/base.html" %}
+{% load dash %}
+{% block content %}
+<div class="page-head"><div><h1>Security &amp; activity</h1><p>An audit trail of who changed what. Entries cannot be edited from the dashboard.</p></div>
+  <div class="actions">{% if can_export %}<a class="btn" href="{% url 'dashboard:activity_export' %}">{% icon "download" 16 %} Export CSV</a>{% endif %}</div></div>
+{% if failed_24h %}<div class="alert alert--warn" style="margin-bottom:14px">{% icon "shield" 18 %}<div><b>{{ failed_24h }} failed sign-in attempt{{ failed_24h|pluralize }}</b> in the last 24 hours. Accounts lock temporarily after repeated failures.</div></div>{% endif %}
+<div class="tabs" style="margin-bottom:14px"><a href="?tab=all" class="{% if tab == 'all' %}active{% endif %}">Everything</a><a href="?tab=security" class="{% if tab == 'security' %}active{% endif %}">Security</a><a href="?tab=content" class="{% if tab == 'content' %}active{% endif %}">Content &amp; data</a></div>
+<div class="card card--flush">
+  <form class="toolbar" method="get"><input type="hidden" name="tab" value="{{ tab }}"><div class="grow"><input class="input" type="search" name="q" value="{{ q }}" placeholder="Search action, person or item…"></div><button class="btn btn-sm">Search</button></form>
+  {% if page.object_list %}<div class="table-wrap"><table class="t table--stack"><thead><tr><th>When</th><th>Who</th><th>Action</th><th>Item</th><th>Details</th><th>IP</th></tr></thead><tbody>
+  {% for a in page.object_list %}<tr><td data-label="When" class="nowrap small">{{ a.created_at|date:"d M Y, H:i" }}</td><td data-label="Who">{{ a.actor_label|default:"System" }}</td>
+    <td data-label="Action"><span class="pill-tag {% if a.is_security %}pill-tag--sec{% endif %}">{{ a.action|pretty_action }}</span></td><td data-label="Item" class="ellipsis">{{ a.target_repr }}</td><td data-label="Details" class="small muted">{{ a.detail }}</td><td data-label="IP" class="mono small">{{ a.ip_address|default:"" }}</td></tr>{% endfor %}</tbody></table></div>
+  {% include "dashboard/_pagination.html" %}
+  {% else %}<div class="empty">{% icon "shield" 36 %}<h3>No activity found</h3></div>{% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,9 @@
+<div class="fontpick" data-fontpick>
+  <input type="hidden" name="{{ widget.name }}" value="{{ widget.value|default_if_none:'' }}"{% include "django/forms/widgets/attrs.html" %}>
+  <button type="button" class="fontpick__btn" aria-haspopup="listbox" aria-expanded="false"><span class="fontpick__name">{{ widget.value }}</span><span class="fontpick__cat"></span><svg class="fontpick__chev" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></button>
+  <div class="fontpick__pop" hidden>
+    <input type="search" class="input fontpick__q" placeholder="Search Google Fonts…" aria-label="Search fonts" autocomplete="off">
+    <div class="fontpick__tabs" role="tablist"></div>
+    <div class="fontpick__list" role="listbox" tabindex="-1"></div>
+  </div>
+</div>

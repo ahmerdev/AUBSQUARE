@@ -1,0 +1,21 @@
+{% load static dash %}<!doctype html>
+<html lang="en" data-theme="dark"><head>
+{% include "dashboard/_head.html" %}
+<title>{% block title %}Sign in{% endblock %} · {{ brand.name|default:"AUB SQUARE" }}</title>
+</head><body>
+<div class="auth">
+  <div class="pill auth-theme" role="group" aria-label="Colour theme">{% include "dashboard/_theme_toggle.html" %}</div>
+  <section class="auth__art" aria-hidden="true">
+    <div class="stage"><div class="rig"><div class="frame"></div><div class="frame"></div><div class="frame"></div><div class="frame"></div></div></div>
+    <h2>Run your studio from one <span>control center</span>.</h2>
+  </section>
+  <section class="auth__panel">
+    <div class="auth__card">
+      <a class="auth__brand" href="/">{% include "dashboard/_brandmark.html" %}<span class="brand__text"><b>{{ brand.name }}</b><span>Control Center</span></span></a>
+      {% for m in flash_messages %}<div class="alert alert--{% if m.level == 'error' %}bad{% elif m.level == 'success' %}ok{% elif m.level == 'warning' %}warn{% else %}info{% endif %}" style="margin-bottom:14px" role="status">{{ m.text }}</div>{% endfor %}
+      {% block body %}{% endblock %}
+    </div>
+  </section>
+</div>
+<script src="{% static 'dashboard/theme.js' %}"></script>
+</body></html>

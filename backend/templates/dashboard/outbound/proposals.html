@@ -1,0 +1,13 @@
+{% extends "dashboard/base.html" %}
+{% load dash %}
+{% block content %}
+<div class="page-head"><div><h1>Proposals</h1><p>Build a branded proposal, send a private link, and see when the client opens it.</p></div>
+  <div class="actions">{% if can_create %}<a class="btn btn-primary" href="{% url 'dashboard:proposal_new' %}">{% icon "plus" 16 %} New proposal</a>{% endif %}</div></div>
+<div style="margin-bottom:14px"><div class="tabs"><a href="?" class="{% if not g.status %}active{% endif %}">All <span class="n">{{ total }}</span></a>{% for k, l in statuses %}<a href="?status={{ k }}" class="{% if g.status == k %}active{% endif %}">{{ l }} <span class="n">{{ counts|get_item:k }}</span></a>{% endfor %}</div></div>
+<div class="card card--flush"><form class="toolbar" method="get"><div class="grow"><input class="input" type="search" name="q" value="{{ g.q }}" placeholder="Search title, client, reference…"></div><button class="btn btn-sm">Search</button></form>
+{% if page.object_list %}<div class="table-wrap"><table class="t table--stack"><thead><tr><th>Proposal</th><th>Client</th><th>Total</th><th>Status</th><th>Opened</th><th></th></tr></thead><tbody>
+{% for p in page.object_list %}<tr><td class="title" data-label="Proposal"><a href="{% url 'dashboard:proposal_detail' p.pk %}">{{ p.title }}</a><div class="muted small">{{ p.reference }}</div></td><td data-label="Client">{{ p.client_name }}<div class="muted small">{{ p.client_company }}</div></td>
+<td data-label="Total" class="nowrap">{{ p.currency }} {{ p.total|floatformat:2 }}</td><td data-label="Status"><span class="badge {{ p.status|badge_class }}">{{ p.get_status_display }}</span></td>
+<td data-label="Opened">{% if p.view_count %}{{ p.view_count }}× · {{ p.last_viewed_at|timesince }} ago{% else %}<span class="muted">—</span>{% endif %}</td><td class="nolabel"><a class="btn btn-sm" href="{% url 'dashboard:proposal_detail' p.pk %}">Open</a></td></tr>{% endfor %}</tbody></table></div>
+{% include "dashboard/_pagination.html" %}{% else %}<div class="empty">{% icon "doc" 36 %}<h3>No proposals yet</h3><p>Create one from a lead, or start from scratch.</p></div>{% endif %}</div>
+{% endblock %}

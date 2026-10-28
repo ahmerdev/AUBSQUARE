@@ -1,0 +1,9 @@
+{% extends "dashboard/base.html" %}
+{% load dash %}
+{% block content %}
+<div class="page-head"><div><h1>Sequences</h1><p>A sequence is a first email plus timed follow-ups. Each step becomes a draft for you to approve, and everything stops the moment a prospect replies, unsubscribes or becomes a lead.</p></div>
+  <div class="actions">{% if can_edit %}<a class="btn btn-primary" href="{% url 'dashboard:sequence_new' %}">{% icon "plus" 16 %} New sequence</a>{% endif %}</div></div>
+<div class="card card--flush">{% if seqs %}<div class="table-wrap"><table class="t"><thead><tr><th>Name</th><th>Steps</th><th>Active prospects</th><th>Status</th><th></th></tr></thead><tbody>
+{% for s in seqs %}<tr><td class="title">{{ s.name }}<div class="muted small">{{ s.description }}</div></td><td>{{ s.n_steps }}</td><td>{{ s.n_active }}</td><td><span class="badge {% if s.is_active %}b-ok{% else %}b-muted{% endif %}">{% if s.is_active %}Active{% else %}Paused{% endif %}</span></td><td><div class="row-actions">{% if can_edit %}<a class="btn btn-sm" href="{% url 'dashboard:sequence_edit' s.pk %}">Edit</a>{% endif %}</div></td></tr>{% endfor %}</tbody></table></div>
+{% else %}<div class="empty"><h3>No sequences yet</h3><p>Create one to follow up automatically (with your approval).</p></div>{% endif %}</div>
+{% endblock %}

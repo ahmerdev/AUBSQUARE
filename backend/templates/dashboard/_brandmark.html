@@ -1,0 +1,1 @@
+{% if brand.logo %}<span class="brand__mark brand__mark--img" data-brand-mark data-initials="{{ brand.initials }}"><img src="{{ brand.logo }}" alt="{{ brand.name }} logo"></span>{% else %}<span class="brand__mark" data-brand-mark data-initials="{{ brand.initials }}">{{ brand.initials }}</span>{% endif %}

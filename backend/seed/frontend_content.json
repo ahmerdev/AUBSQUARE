@@ -1,0 +1,951 @@
+{
+  "services": [
+    {
+      "id": "brand-identity",
+      "title": "Brand Identity & Logo Design",
+      "isPrimary": true,
+      "shortDescription": "Memorable brand systems, iconic logo marks, comprehensive guidelines, and strategic visual positioning.",
+      "fullDescription": "Your brand identity is how the world perceives your business in the first 3 seconds. We engineer cohesive visual languages, memorable logo marks, strategic color palettes, and typographic hierarchies that command respect and convert customers.",
+      "iconName": "Sparkles",
+      "deliverables": [
+        "Primary & Secondary Logo Marks",
+        "Comprehensive Brand Guidelines (PDF)",
+        "Color Palette & Typography System",
+        "Business Card & Stationery Kit",
+        "Social Media Avatar & Banner Suite",
+        "Vector & Print-Ready Files (.AI, .SVG, .PNG, .PDF)"
+      ],
+      "process": [
+        {
+          "step": "01",
+          "title": "Brand Discovery",
+          "description": "Deep analysis of your target audience, competitors, and unique value proposition."
+        },
+        {
+          "step": "02",
+          "title": "Concept Creation",
+          "description": "Exploring 3-4 distinct strategic visual directions and logo concepts."
+        },
+        {
+          "step": "03",
+          "title": "Refinement",
+          "description": "Fine-tuning geometry, custom typography, and balanced color systems."
+        },
+        {
+          "step": "04",
+          "title": "Brand Kit Delivery",
+          "description": "Exporting production-ready assets and comprehensive usage guidelines."
+        }
+      ],
+      "benefits": [
+        "Instantly look like an established, trustworthy brand",
+        "Stand out decisively from commoditized competitors",
+        "Unify all customer touchpoints with visual consistency",
+        "Accelerate customer acquisition and brand recall"
+      ],
+      "faqs": [
+        {
+          "question": "How long does a brand identity project take?",
+          "answer": "Typically 1 to 2 weeks depending on scope and revision cycles."
+        },
+        {
+          "question": "Do I get full vector copyright ownership?",
+          "answer": "Yes! Upon final delivery, 100% intellectual property rights belong to you."
+        }
+      ]
+    },
+    {
+      "id": "graphic-design",
+      "title": "Graphic Design",
+      "isPrimary": false,
+      "shortDescription": "High-impact promotional materials, brochures, packaging, pitch decks, and digital assets.",
+      "fullDescription": "From high-stakes investor pitch decks to premium packaging and commercial print assets, we craft visuals that arrest attention and clearly communicate your value.",
+      "iconName": "Palette",
+      "deliverables": [
+        "Investor Pitch Decks & Keynote Presentations",
+        "Brochures, Flyers & Marketing Collateral",
+        "Product Packaging & Label Design",
+        "Billboards, Rollups & Event Signage",
+        "Infographics & Vector Illustrations"
+      ],
+      "process": [
+        {
+          "step": "01",
+          "title": "Briefing",
+          "description": "Aligning on content hierarchy, dimensions, and audience expectations."
+        },
+        {
+          "step": "02",
+          "title": "Visual Composition",
+          "description": "Crafting high-fidelity layouts with intentional white space and focus."
+        },
+        {
+          "step": "03",
+          "title": "Feedback Loop",
+          "description": "Rapid revisions and collaborative review."
+        },
+        {
+          "step": "04",
+          "title": "Production Export",
+          "description": "Print-ready CMYK/Pantone files with bleed and digital RGB exports."
+        }
+      ],
+      "benefits": [
+        "Communicate complex messages in a glance",
+        "Win investor backing with compelling pitch presentations",
+        "Elevate product perceived value on shelves and online",
+        "Consistent visual language across print and screen"
+      ]
+    },
+    {
+      "id": "ui-ux-design",
+      "title": "Web & App UI/UX Design",
+      "isPrimary": false,
+      "shortDescription": "User-centric wireframing, high-fidelity prototypes, interactive micro-interactions, and design systems.",
+      "fullDescription": "We design intuitive, conversion-optimized web and mobile app interfaces that users love. Grounded in research and modern interaction patterns, our designs turn complex workflows into delightful experiences.",
+      "iconName": "Layout",
+      "deliverables": [
+        "User Journey Maps & Wireframes",
+        "Figma High-Fidelity UI Mockups",
+        "Clickable Interactive Prototypes",
+        "Scalable Design System & Component Library",
+        "Developer Handoff Specifications & Tokens"
+      ],
+      "process": [
+        {
+          "step": "01",
+          "title": "User Research",
+          "description": "Mapping user journeys, friction points, and conversion goals."
+        },
+        {
+          "step": "02",
+          "title": "Wireframing",
+          "description": "Structuring layout, content priority, and flow before visual styling."
+        },
+        {
+          "step": "03",
+          "title": "UI Design",
+          "description": "Applying modern dark/light aesthetics, glassmorphism, and micro-interactions."
+        },
+        {
+          "step": "04",
+          "title": "Design System",
+          "description": "Standardizing typography, spacing, and reusable auto-layout components."
+        }
+      ],
+      "benefits": [
+        "Dramatically higher conversion rates and retention",
+        "Reduced development time with exact Figma specs",
+        "Flawless user flow with zero cognitive overload",
+        "Seamless multi-device responsiveness"
+      ]
+    },
+    {
+      "id": "web-development",
+      "title": "Web Development",
+      "isPrimary": false,
+      "shortDescription": "Modern, high-performance websites built with React, Vite, Next.js, and interactive 3D WebGL experiences.",
+      "fullDescription": "We build ultra-fast, animated, production-grade web applications. Combining clean React architectures with smooth animations and interactive 3D elements, our sites engage users and rank high on search engines.",
+      "iconName": "Code",
+      "deliverables": [
+        "Custom React / Next.js Web Applications",
+        "Interactive 3D WebGL & Three.js Scenes",
+        "Framer Motion Micro-Interactions & Scroll Animations",
+        "SEO Optimized Semantic Markup & Meta Tags",
+        "Responsive Across All Mobile, Tablet & Desktop Viewports",
+        "Full Source Code & Deployment Setup"
+      ],
+      "process": [
+        {
+          "step": "01",
+          "title": "Architecture Planning",
+          "description": "Selecting modular components, data schemas, and state management."
+        },
+        {
+          "step": "02",
+          "title": "Development",
+          "description": "Building clean TypeScript React components with Tailwind CSS."
+        },
+        {
+          "step": "03",
+          "title": "3D & Motion Polish",
+          "description": "Integrating Three.js canvases and responsive Framer Motion animations."
+        },
+        {
+          "step": "04",
+          "title": "QA & Optimization",
+          "description": "Performance auditing, cross-browser testing, and SEO verification."
+        }
+      ],
+      "benefits": [
+        "Sub-second load times and exceptional Core Web Vitals",
+        "Award-winning visual presentation that wows clients",
+        "Clean maintainable codebase built for scalability",
+        "Built-in search engine optimization and accessibility"
+      ]
+    },
+    {
+      "id": "social-media",
+      "title": "Social Media & Content",
+      "isPrimary": false,
+      "shortDescription": "Strategic social templates, carousel designs, motion graphics, and cohesive digital brand presence.",
+      "fullDescription": "We help brands capture attention across Instagram, LinkedIn, YouTube, and X. With strategic content design and motion graphics, we turn casual scrollers into engaged followers and loyal buyers.",
+      "iconName": "Share2",
+      "deliverables": [
+        "Instagram Grid & Carousel Templates",
+        "LinkedIn Thought-Leadership Post Graphics",
+        "Motion Graphics & Reel/Short Video Covers",
+        "Ad Creatives with High Click-Through Rates",
+        "Editable Canva/Figma Template Kits"
+      ],
+      "process": [
+        {
+          "step": "01",
+          "title": "Audience Strategy",
+          "description": "Identifying visual formats that resonate on target platforms."
+        },
+        {
+          "step": "02",
+          "title": "Template Architecture",
+          "description": "Creating distinct post types (educational, promotional, story)."
+        },
+        {
+          "step": "03",
+          "title": "Content Production",
+          "description": "Crafting striking carousels and motion assets."
+        },
+        {
+          "step": "04",
+          "title": "Performance Review",
+          "description": "Iterating designs based on engagement analytics."
+        }
+      ],
+      "benefits": [
+        "Consistent, cohesive daily presence across all platforms",
+        "Higher engagement and algorithmic reach",
+        "Fast content creation with reusable branded templates",
+        "Direct pipeline from social followers to paying clients"
+      ]
+    }
+  ],
+  "projects": [
+    {
+      "id": "hotfm-105",
+      "slug": "hotfm-105",
+      "title": "HOTFM 105",
+      "client": "HOTFM Media Network",
+      "category": "Branding",
+      "year": "2025",
+      "thumbnail": "https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?auto=format&fit=crop&w=1200&q=80",
+      "images": [
+        "https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?auto=format&fit=crop&w=1200&q=80",
+        "https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?auto=format&fit=crop&w=1200&q=80",
+        "https://images.unsplash.com/photo-1470225620780-dba8ba36b745?auto=format&fit=crop&w=1200&q=80"
+      ],
+      "summary": "A vibrant brand modernization and sonic visual identity for a premier nationwide radio broadcasting network.",
+      "challenge": "HOTFM 105 needed a dynamic refresh to engage Gen Z and millennial listeners without alienating their loyal legacy radio audience.",
+      "solution": "Designed an energetic soundwave-inspired logo mark, bold neon chromatic typography, and an adaptable digital broadcasting brand suite.",
+      "deliverables": [
+        "Visual Identity & Logo Rebrand",
+        "On-Air Graphic Overlays",
+        "Mobile Streaming App UI Guide",
+        "Studio Environmental Signage"
+      ],
+      "servicesProvided": [
+        "Brand Identity & Logo Design",
+        "Graphic Design",
+        "Web & App UI/UX Design"
+      ],
+      "featured": true,
+      "metrics": [
+        {
+          "label": "Brand Recognition",
+          "value": "+45%"
+        },
+        {
+          "label": "Youth Engagement",
+          "value": "+62%"
+        }
+      ],
+      "testimonial": {
+        "quote": "AUB SQUARE completely revitalized our radio brand. The new look is energetic, modern, and instantly recognizable on both FM dials and digital streaming apps.",
+        "author": "Station Director",
+        "role": "HOTFM 105 Network"
+      }
+    },
+    {
+      "id": "maximum-capital-group",
+      "slug": "maximum-capital-group",
+      "title": "Maximum Capital Group",
+      "client": "Maximum Capital Group",
+      "category": "Branding",
+      "year": "2025",
+      "thumbnail": "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=1200&q=80",
+      "images": [
+        "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=1200&q=80",
+        "https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?auto=format&fit=crop&w=1200&q=80",
+        "https://images.unsplash.com/photo-1507679799987-c73779587ccf?auto=format&fit=crop&w=1200&q=80"
+      ],
+      "summary": "Institutional grade brand identity, investor presentation deck, and corporate website for a high-growth private equity fund.",
+      "challenge": "Building immediate trust and institutional prestige for a modern venture capital and private equity firm managing eight-figure portfolios.",
+      "solution": "Formulated a minimalist architectural monogram with deep violet and metallic accents, communicating mathematical precision and enduring wealth management.",
+      "deliverables": [
+        "Corporate Brand Guidelines",
+        "Investor Pitch Deck & Keynotes",
+        "Secure Investor Portal UI/UX",
+        "Luxury Stationery & Embossed Collateral"
+      ],
+      "servicesProvided": [
+        "Brand Identity & Logo Design",
+        "Web Development",
+        "Graphic Design"
+      ],
+      "featured": true,
+      "metrics": [
+        {
+          "label": "Fund Inflow Closed",
+          "value": "$24M+"
+        },
+        {
+          "label": "Meeting Conversion",
+          "value": "+38%"
+        }
+      ],
+      "testimonial": {
+        "quote": "Bilal and Shahwaiz delivered an identity that made institutional investors take us seriously from day one. Uncompromising attention to detail.",
+        "author": "Managing Partner",
+        "role": "Maximum Capital Group"
+      }
+    },
+    {
+      "id": "zitc",
+      "slug": "zitc",
+      "title": "ZITC Technology Cloud",
+      "client": "ZITC International",
+      "category": "Web Development",
+      "year": "2024",
+      "thumbnail": "https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&w=1200&q=80",
+      "images": [
+        "https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&w=1200&q=80",
+        "https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=1200&q=80",
+        "https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?auto=format&fit=crop&w=1200&q=80"
+      ],
+      "summary": "A futuristic 3D web platform showcasing enterprise cloud infrastructure and cybersecurity solutions with interactive WebGL servers.",
+      "challenge": "ZITC had complex technical products that were hard to explain to C-level executives through traditional static text.",
+      "solution": "Engineered an interactive 3D WebGL infrastructure visualizer where prospects can interact with server architecture directly in the browser.",
+      "deliverables": [
+        "Interactive 3D Three.js Architecture",
+        "Full-Stack React Web Application",
+        "Custom Dark Glassmorphic Design System",
+        "Automated Enterprise Lead Intake"
+      ],
+      "servicesProvided": [
+        "Web Development",
+        "Web & App UI/UX Design"
+      ],
+      "featured": true,
+      "metrics": [
+        {
+          "label": "Avg Session Duration",
+          "value": "4m 12s"
+        },
+        {
+          "label": "Lead Inquiries",
+          "value": "+115%"
+        }
+      ],
+      "testimonial": {
+        "quote": "The 3D interactive web platform built by AUB SQUARE set us years ahead of our enterprise competitors.",
+        "author": "Chief Technology Officer",
+        "role": "ZITC"
+      }
+    },
+    {
+      "id": "hamza-hafeez",
+      "slug": "hamza-hafeez",
+      "title": "Hamza Hafeez Personal Brand",
+      "client": "Hamza Hafeez International",
+      "category": "Graphic Design",
+      "year": "2024",
+      "thumbnail": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=1200&q=80",
+      "images": [
+        "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=1200&q=80",
+        "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=1200&q=80"
+      ],
+      "summary": "Executive personal branding, keynote presentations, and personal digital ecosystem for an international speaker and consultant.",
+      "challenge": "Creating a unified, charismatic personal brand across speaking stages, social platforms, and published books.",
+      "solution": "Crafted an elegant signature monogram, bespoke editorial layouts, and high-impact social media assets that elevated his consulting authority.",
+      "deliverables": [
+        "Executive Brand Guidelines",
+        "Keynote Slide Master Library",
+        "Social Media Thought-Leadership Kits",
+        "Personal Portfolio Site"
+      ],
+      "servicesProvided": [
+        "Brand Identity & Logo Design",
+        "Graphic Design",
+        "Social Media & Content"
+      ],
+      "featured": true,
+      "metrics": [
+        {
+          "label": "Keynote Bookings",
+          "value": "+85%"
+        },
+        {
+          "label": "LinkedIn Reach",
+          "value": "1.2M+"
+        }
+      ]
+    },
+    {
+      "id": "welmac",
+      "slug": "welmac",
+      "title": "Welmac Engineering",
+      "client": "Welmac Global Corp",
+      "category": "UI/UX Design",
+      "year": "2024",
+      "thumbnail": "https://images.unsplash.com/photo-1581092160607-ee22621dd758?auto=format&fit=crop&w=1200&q=80",
+      "images": [
+        "https://images.unsplash.com/photo-1581092160607-ee22621dd758?auto=format&fit=crop&w=1200&q=80",
+        "https://images.unsplash.com/photo-1581092335397-9583fe92d232?auto=format&fit=crop&w=1200&q=80"
+      ],
+      "summary": "Industrial engineering procurement catalog and B2B quote-generation portal with real-time specification filtering.",
+      "challenge": "Simplifying a catalog of over 4,000 industrial machinery components for global procurement officers.",
+      "solution": "Designed an ultra-clean, intuitive web interface with instant parametric search, CAD download integration, and one-click quote requests.",
+      "deliverables": [
+        "B2B Portal UI/UX Design",
+        "Component Design System",
+        "Quote Generator Flow",
+        "Mobile Tablet Field App"
+      ],
+      "servicesProvided": [
+        "Web & App UI/UX Design",
+        "Web Development"
+      ],
+      "featured": true,
+      "metrics": [
+        {
+          "label": "RFQ Completion Rate",
+          "value": "+74%"
+        },
+        {
+          "label": "Procurement Cycle",
+          "value": "-30%"
+        }
+      ]
+    },
+    {
+      "id": "nexpay-fintech",
+      "slug": "nexpay-fintech",
+      "title": "NexaPay Global",
+      "client": "NexaPay Finance",
+      "category": "UI/UX Design",
+      "year": "2025",
+      "thumbnail": "https://images.unsplash.com/photo-1563986768609-322da13575f3?auto=format&fit=crop&w=1200&q=80",
+      "images": [
+        "https://images.unsplash.com/photo-1563986768609-322da13575f3?auto=format&fit=crop&w=1200&q=80"
+      ],
+      "summary": "Cross-border multi-currency digital wallet and payments app designed for seamless international remittances.",
+      "challenge": "Reducing cognitive friction in currency conversions and complex regulatory compliance steps during sign-up.",
+      "solution": "Developed an ergonomic mobile-first interface featuring real-time rate calculators, biometrics, and dark glass card visual balance.",
+      "deliverables": [
+        "iOS & Android UI Design",
+        "Interactive Design System",
+        "Onboarding User Flow Optimization"
+      ],
+      "servicesProvided": [
+        "Web & App UI/UX Design",
+        "Brand Identity & Logo Design"
+      ],
+      "featured": false,
+      "metrics": [
+        {
+          "label": "App Store Rating",
+          "value": "4.9 ★"
+        },
+        {
+          "label": "Active Users",
+          "value": "250K+"
+        }
+      ]
+    }
+  ],
+  "caseStudies": [
+    {
+      "id": "hotfm-rebrand",
+      "slug": "hotfm-105-nationwide-rebrand",
+      "title": "Modernizing a National Broadcast Icon for Digital Audiences",
+      "client": "HOTFM 105 Network",
+      "industry": "Media & Entertainment",
+      "category": "Brand Strategy & Visual Identity",
+      "heroImage": "https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?auto=format&fit=crop&w=1400&q=85",
+      "galleryImages": [
+        "https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?auto=format&fit=crop&w=1200&q=80",
+        "https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?auto=format&fit=crop&w=1200&q=80",
+        "https://images.unsplash.com/photo-1470225620780-dba8ba36b745?auto=format&fit=crop&w=1200&q=80"
+      ],
+      "summary": "How AUB SQUARE transformed Pakistan’s premier FM radio network into a multi-platform audio streaming powerhouse.",
+      "challenge": "HOTFM 105 had maintained the same broadcast visual identity for over a decade. While their listener base remained loyal, younger demographics were shifting rapidly toward Spotify, podcasts, and digital streams. The existing logo was static, lacked digital legibility at small app icon sizes, and failed to communicate the network's high-energy lifestyle programming.",
+      "strategy": "We conducted an in-depth demographic analysis comparing traditional FM listenership with digital stream consumption. Our creative direction centered on \"Sonic Vibrancy\"—translating audio frequencies and youthful energy into an iconic monogram that flexes effortlessly across outdoor mega-billboards, studio mics, and smartphone lock screens.",
+      "solution": "Engineered a modern, responsive logo system accompanied by an ultra-vibrant magenta-to-electric-violet color palette. We designed on-air motion bugs, dynamic lower-thirds for video broadcasts, and an ergonomic mobile streaming app design system.",
+      "deliverables": [
+        "Complete Brand Architecture & Guidelines",
+        "Dynamic Sonic Logo Mark & Monogram",
+        "Digital Streaming Mobile App UI/UX",
+        "Nationwide Billboard & Vehicle Fleet Wrap Kit",
+        "On-Air Studio Broadcast Motion Graphics"
+      ],
+      "results": [
+        {
+          "label": "Brand Recognition",
+          "value": "+45%",
+          "change": "Post-launch brand recall study"
+        },
+        {
+          "label": "Streaming App Installs",
+          "value": "180K+",
+          "change": "First 90 days after relaunch"
+        },
+        {
+          "label": "Social Engagement",
+          "value": "+62%",
+          "change": "Year-over-year organic reach"
+        }
+      ],
+      "featured": true,
+      "testimonial": {
+        "quote": "AUB SQUARE did not just design a logo; they completely re-energized our entire network. The feedback from both our sponsors and younger listeners has been universally stellar.",
+        "author": "Managing Director",
+        "role": "HOTFM 105 Media Network",
+        "country": "Pakistan"
+      }
+    },
+    {
+      "id": "maximum-capital-scale",
+      "slug": "maximum-capital-investor-scale",
+      "title": "Building Institutional Credibility for an Eight-Figure Private Equity Fund",
+      "client": "Maximum Capital Group",
+      "industry": "Venture Capital & Private Equity",
+      "category": "Corporate Identity & Pitch Strategy",
+      "heroImage": "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=1400&q=85",
+      "galleryImages": [
+        "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=1200&q=80",
+        "https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?auto=format&fit=crop&w=1200&q=80",
+        "https://images.unsplash.com/photo-1507679799987-c73779587ccf?auto=format&fit=crop&w=1200&q=80"
+      ],
+      "summary": "A bespoke brand ecosystem, investor prospectus, and web portal that secured $24M in fresh institutional funding.",
+      "challenge": "Maximum Capital Group was launching a new opportunistic growth fund targeting mid-market acquisitions in North America and EMEA. In private equity, high-net-worth investors and family offices evaluate firm credibility within seconds. A generic template deck or mediocre website would immediately jeopardize multi-million-dollar commitments.",
+      "strategy": "Our team structured a brand positioning of \"Disciplined Horizon\"—communicating fiduciary rigor, mathematical calculation, and visionary expansion. We chose a refined palette of nocturnal slate, deep royal amethyst, and warm platinum, reflecting understated luxury and enduring stability.",
+      "solution": "Designed an architectural monogram evoking growth vectors and vault security. We authored and formatted a comprehensive 48-page investor memorandum with bespoke data visualizations, custom financial charts, and an encrypted LP investor portal interface.",
+      "deliverables": [
+        "Institutional Brand Standards & Identity",
+        "Bespoke 48-Page Investor Deck & Keynotes",
+        "Private LP Web Portal UI/UX",
+        "Executive Stationery with Embossed Foil Printing",
+        "Data Room Presentation Templates"
+      ],
+      "results": [
+        {
+          "label": "Capital Raised",
+          "value": "$24M+",
+          "change": "Fund closed ahead of schedule"
+        },
+        {
+          "label": "Deck Conversion Rate",
+          "value": "38%",
+          "change": "Meetings converted into LPs"
+        },
+        {
+          "label": "Time to Close",
+          "value": "-25%",
+          "change": "Reduced LP evaluation timeline"
+        }
+      ],
+      "featured": true,
+      "testimonial": {
+        "quote": "Bilal and Shahwaiz operate at a caliber rarely seen in creative agencies. Their understanding of executive prestige and investor psychology was crucial to closing our fund.",
+        "author": "Senior Partner",
+        "role": "Maximum Capital Group",
+        "country": "United Kingdom / UAE"
+      }
+    },
+    {
+      "id": "zitc-cloud-3d",
+      "slug": "zitc-interactive-cloud-experience",
+      "title": "Transforming Enterprise Cloud Infrastructure into an Interactive 3D Journey",
+      "client": "ZITC Cloud Solutions",
+      "industry": "Enterprise Cloud & Cybersecurity",
+      "category": "3D WebGL & Interactive UI/UX",
+      "heroImage": "https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&w=1400&q=85",
+      "galleryImages": [
+        "https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&w=1200&q=80",
+        "https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=1200&q=80",
+        "https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?auto=format&fit=crop&w=1200&q=80"
+      ],
+      "summary": "Replacing dry technical documentation with an immersive WebGL digital twin of modern cloud server infrastructure.",
+      "challenge": "ZITC had developed cutting-edge distributed microservices and DDoS mitigation infrastructure, but their sales cycle was bogged down by dense whitepapers and static architecture diagrams that failed to captivate enterprise CIOs.",
+      "strategy": "Instead of telling prospective clients how fast and resilient ZITC’s servers are, we decided to show them in real-time 3D. We conceptualized an interactive 3D digital server rack that responds to user scroll, allowing visitors to visually \"pull out\" server nodes and explore latency benchmarks.",
+      "solution": "Built an optimized Three.js / React Three Fiber interactive 3D web platform with custom glassmorphism shaders, smooth camera choreography, and real-time enterprise quote calculators.",
+      "deliverables": [
+        "Interactive 3D WebGL Web Platform",
+        "Technical Architecture Iconography System",
+        "Enterprise RFQ Calculator & Lead Flow",
+        "Mobile-Optimized WebGL Fallback Architecture"
+      ],
+      "results": [
+        {
+          "label": "Avg Session Duration",
+          "value": "4m 12s",
+          "change": "+240% vs industry benchmark"
+        },
+        {
+          "label": "Inbound Enterprise RFQs",
+          "value": "+115%",
+          "change": "Increase in qualified enterprise leads"
+        },
+        {
+          "label": "Page Speed Score",
+          "value": "98/100",
+          "change": "Optimized WebGL asset streaming"
+        }
+      ],
+      "featured": true,
+      "testimonial": {
+        "quote": "Our enterprise sales demos went from tedious slide presentations to clients literally saying \"Wow\" within seconds of opening the site. AUB SQUARE delivered pure excellence.",
+        "author": "CTO & Co-Founder",
+        "role": "ZITC Cloud Solutions",
+        "country": "United States"
+      }
+    }
+  ],
+  "articles": [
+    {
+      "id": "art-1",
+      "slug": "why-cheap-logos-cost-startups-millions",
+      "title": "Why Cheap Logos Cost Startups Millions in Lost Revenue and Trust",
+      "category": "Branding",
+      "excerpt": "Your customers evaluate your legitimacy in less than three seconds. Here is the hidden math behind why cheap visual identities repel high-paying clients.",
+      "featuredImage": "https://images.unsplash.com/photo-1558655146-d09347e92766?auto=format&fit=crop&w=1200&q=80",
+      "publishDate": "October 18, 2026",
+      "readingTime": "6 min read",
+      "author": {
+        "name": "Muhammad Bilal",
+        "role": "Founder & Lead Designer at AUB SQUARE",
+        "avatar": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=200&q=80"
+      },
+      "tableOfContents": [
+        {
+          "id": "the-3-second-heuristic",
+          "title": "1. The 3-Second Cognitive Heuristic"
+        },
+        {
+          "id": "the-hidden-math-of-trust",
+          "title": "2. The Hidden Math of Customer Trust"
+        },
+        {
+          "id": "brand-cohesion-vs-isolated-graphics",
+          "title": "3. Cohesion vs. Isolated Graphics"
+        },
+        {
+          "id": "how-to-fix-your-brand-today",
+          "title": "4. How to Elevate Your Brand Strategy"
+        }
+      ],
+      "content": [
+        {
+          "sectionId": "the-3-second-heuristic",
+          "heading": "The 3-Second Cognitive Heuristic",
+          "paragraphs": [
+            "When a prospect arrives on your website or social profile for the first time, their brain makes a series of subconscious snap judgments before they read a single sentence of your copy. Behavioral economists call this the aesthetic-usability effect and credibility heuristic.",
+            "If your logo looks like it came from an overused template generator or a $15 marketplace contest, the viewer intuitively calculates: \"If they cut corners on their own face to the world, they will probably cut corners on my service.\""
+          ],
+          "pullQuote": "A logo isn’t just an illustration; it is an equity anchor for every dollar of advertising and customer goodwill you ever generate."
+        },
+        {
+          "sectionId": "the-hidden-math-of-trust",
+          "heading": "The Hidden Math of Customer Trust",
+          "paragraphs": [
+            "Consider two competing B2B companies offering SaaS analytics for $2,000 per month. Company A has an inconsistent color palette, mismatched typography, and a generic clip-art monogram. Company B has a coherent, custom-designed dark glass brand identity, authoritative typographic hierarchy, and custom vector iconography.",
+            "Company B can effortlessly command higher pricing, experience shorter sales cycles, and face fewer objections regarding security and professionalism. The cost difference between a poor identity and a bespoke brand system is repaid tenfold within the first few closed deals."
+          ],
+          "keyPoints": [
+            "Premium branding reduces buyer hesitation and price sensitivity.",
+            "Consistency across touchpoints triples brand recall.",
+            "Investor confidence correlates directly with professional visual poise."
+          ]
+        },
+        {
+          "sectionId": "brand-cohesion-vs-isolated-graphics",
+          "heading": "Brand Cohesion vs. Isolated Graphics",
+          "paragraphs": [
+            "Many founders mistake a standalone logo file for a brand identity. In reality, a logo is only 10% of the equation. What makes a company look like an established market leader is brand cohesion: the consistent relationship between your headline typography, negative space, color accents, and motion design.",
+            "When every invoice, pitch deck, LinkedIn carousel, and web page speaks the exact same visual dialect, your business feels monolithic and dependable."
+          ]
+        },
+        {
+          "sectionId": "how-to-fix-your-brand-today",
+          "heading": "How to Elevate Your Brand Strategy",
+          "paragraphs": [
+            "If you find your sales team constantly defending your prices or your website suffering from high bounce rates, examine your visual foundations. Investing in an intentional, strategic brand identity is the highest-leverage lever to accelerate your commercial trajectory."
+          ]
+        }
+      ],
+      "featured": true
+    },
+    {
+      "id": "art-2",
+      "slug": "the-rise-of-3d-web-experiences-in-modern-ui",
+      "title": "The Rise of 3D Web Experiences: Why Flat Web Design Is No Longer Enough",
+      "category": "Web Development",
+      "excerpt": "Explore how real-time WebGL, Three.js, and spatial interaction are creating emotional bonds that flat 2D pages simply cannot replicate.",
+      "featuredImage": "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=1200&q=80",
+      "publishDate": "October 12, 2026",
+      "readingTime": "5 min read",
+      "author": {
+        "name": "Mohammad Shahwaiz",
+        "role": "Co-Founder & Full-Stack Developer at AUB SQUARE",
+        "avatar": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=200&q=80"
+      },
+      "tableOfContents": [
+        {
+          "id": "the-death-of-the-cookie-cutter-landing-page",
+          "title": "1. The Death of the Cookie-Cutter Landing Page"
+        },
+        {
+          "id": "webgl-performance-in-2026",
+          "title": "2. WebGL Performance in 2026"
+        },
+        {
+          "id": "converting-delight-into-pipeline",
+          "title": "3. Converting 3D Delight into Pipeline"
+        }
+      ],
+      "content": [
+        {
+          "sectionId": "the-death-of-the-cookie-cutter-landing-page",
+          "heading": "The Death of the Cookie-Cutter Landing Page",
+          "paragraphs": [
+            "For the past eight years, the web has suffered from aesthetic homogenization. Every startup landing page looks nearly identical: an off-white background, an arbitrary purple pill badge, a generic hero screenshot, and three feature columns.",
+            "Modern consumers and enterprise buyers have developed blindness to this template. When your website feels indistinguishable from 500 other competitors, your value proposition blends into the noise."
+          ],
+          "pullQuote": "Interactive 3D environments transform passive website visitors into active participants who remember your brand."
+        },
+        {
+          "sectionId": "webgl-performance-in-2026",
+          "heading": "WebGL Performance in 2026",
+          "paragraphs": [
+            "The historical objection to 3D on the web was performance: heavy asset sizes, slow mobile frame rates, and battery drain. With modern toolchains like React Three Fiber, Drei, and optimized geometry compression, we can stream interactive 3D assets that weigh less than an average hero photograph.",
+            "By providing graceful CSS/canvas fallbacks and respecting device pixel ratios, 3D experiences can run at a buttery 60 FPS across both desktop workstations and mobile browsers."
+          ],
+          "keyPoints": [
+            "Progressive asset streaming prevents layout shifts.",
+            "Fallbacks guarantee accessibility when hardware acceleration is disabled.",
+            "Subtle orbital motion drives 3x longer dwell times."
+          ]
+        },
+        {
+          "sectionId": "converting-delight-into-pipeline",
+          "heading": "Converting 3D Delight into Pipeline",
+          "paragraphs": [
+            "Crucially, 3D should never be added for novelty alone. The best 3D interactions clarify complex architectures, showcase physical or digital products in dimensional fidelity, and reward user curiosity with intuitive micro-interactions that lead directly into conversion points."
+          ]
+        }
+      ],
+      "featured": true
+    },
+    {
+      "id": "art-3",
+      "slug": "designing-high-converting-ui-ux-for-startups",
+      "title": "The Modern UI/UX Blueprint: 5 Principles That Turn Casual Visitors Into Buyers",
+      "category": "Design",
+      "excerpt": "A comprehensive tactical guide to information architecture, visual hierarchy, micro-copy, and frictionless checkout flows.",
+      "featuredImage": "https://images.unsplash.com/photo-1507238691740-187a5b1d37b8?auto=format&fit=crop&w=1200&q=80",
+      "publishDate": "September 29, 2026",
+      "readingTime": "7 min read",
+      "author": {
+        "name": "Muhammad Bilal",
+        "role": "Founder & Lead Designer at AUB SQUARE",
+        "avatar": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=200&q=80"
+      },
+      "tableOfContents": [
+        {
+          "id": "visual-hierarchy-f-pattern",
+          "title": "1. Mastering The Visual Hierarchy"
+        },
+        {
+          "id": "glassmorphism-with-purpose",
+          "title": "2. Glassmorphism With Purpose"
+        },
+        {
+          "id": "frictionless-modals-vs-long-forms",
+          "title": "3. Frictionless Modals vs Long Forms"
+        }
+      ],
+      "content": [
+        {
+          "sectionId": "visual-hierarchy-f-pattern",
+          "heading": "Mastering The Visual Hierarchy",
+          "paragraphs": [
+            "Human eyes follow strict scanning patterns. By utilizing selective contrast—reserving your highest-saturation magenta and purple highlights exclusively for primary conversion actions—you guide the visitor’s gaze effortlessly down the conversion funnel.",
+            "Avoid competing focal points. If every element is shouting for attention with neon gradients, nothing gets noticed."
+          ],
+          "pullQuote": "Simplicity is not the lack of clutter; it is the presence of purpose."
+        },
+        {
+          "sectionId": "glassmorphism-with-purpose",
+          "heading": "Glassmorphism With Purpose",
+          "paragraphs": [
+            "Glassmorphism is more than a trendy visual style; it establishes a spatial z-axis hierarchy. Semi-translucent panels with subtle backdrop blur give users spatial context, allowing them to perceive where they are in an application without losing sight of the underlying canvas."
+          ]
+        },
+        {
+          "sectionId": "frictionless-modals-vs-long-forms",
+          "heading": "Frictionless Modals vs Long Forms",
+          "paragraphs": [
+            "Embedding a massive 10-field contact form in the middle of a marketing page introduces severe psychological inertia. Instead, triggering a focused, spring-animated modal upon explicit user intent (\"Get a Free Quote\") dramatically increases form completion rates.",
+            "Always provide inline field validation, instant feedback, and accessible touch targets for mobile users."
+          ],
+          "keyPoints": [
+            "Modal lead forms boost conversion by isolating user focus.",
+            "Pre-filling known data points eliminates repetitive typing.",
+            "Clear error states guide rather than penalize the applicant."
+          ]
+        }
+      ],
+      "featured": true
+    },
+    {
+      "id": "art-4",
+      "slug": "scaling-b2b-social-media-presence",
+      "title": "Stop Posting Boring Graphics: How B2B Brands Can Dominate LinkedIn and Instagram",
+      "category": "Marketing",
+      "excerpt": "How modern agencies and founders use editorial carousel systems and motion teasers to build massive organic distribution.",
+      "featuredImage": "https://images.unsplash.com/photo-1611162617474-5b21e879e113?auto=format&fit=crop&w=1200&q=80",
+      "publishDate": "September 15, 2026",
+      "readingTime": "4 min read",
+      "author": {
+        "name": "Muhammad Bilal",
+        "role": "Founder & Lead Designer at AUB SQUARE",
+        "avatar": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=200&q=80"
+      },
+      "tableOfContents": [
+        {
+          "id": "editorial-carousels",
+          "title": "1. The Power of Editorial Carousels"
+        },
+        {
+          "id": "template-systems-that-scale",
+          "title": "2. Template Systems That Scale"
+        }
+      ],
+      "content": [
+        {
+          "sectionId": "editorial-carousels",
+          "heading": "The Power of Editorial Carousels",
+          "paragraphs": [
+            "Static text quotes no longer stop the scroll on modern social algorithms. Swipable carousels structured like mini-magazines capture dwell time—the single most important algorithmic ranking factor.",
+            "By designing high-contrast slide decks with bold typography and dark glass backgrounds, your brand commands the timeline."
+          ]
+        },
+        {
+          "sectionId": "template-systems-that-scale",
+          "heading": "Template Systems That Scale",
+          "paragraphs": [
+            "Great social presence is sustainable only when powered by modular design systems. By standardizing 4-5 core layout archetypes in Figma, your marketing team can generate high-fidelity assets in minutes instead of days."
+          ]
+        }
+      ],
+      "featured": false
+    }
+  ],
+  "testimonials": [
+    {
+      "id": "test-1",
+      "clientName": "David Sterling",
+      "role": "Managing Partner",
+      "company": "Maximum Capital Group",
+      "country": "United Kingdom",
+      "avatar": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=200&q=80",
+      "rating": 5,
+      "content": "AUB SQUARE completely transformed how institutional investors perceive our fund. Bilal and Shahwaiz delivered an exceptional brand identity and deck that helped us close our $24M target fund ahead of schedule. Incredible attention to detail.",
+      "projectType": "Brand Identity & Investor Deck"
+    },
+    {
+      "id": "test-2",
+      "clientName": "Kamran Tariq",
+      "role": "Station Operations Director",
+      "company": "HOTFM 105 Network",
+      "country": "Pakistan",
+      "avatar": "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=200&q=80",
+      "rating": 5,
+      "content": "Our radio network desperately needed to appeal to younger streaming audiences. AUB SQUARE revitalized our entire sonic visual identity, mobile app UI, and billboard presence. The energetic magenta and violet branding turned heads across the country.",
+      "projectType": "Full Network Rebrand & Mobile UI"
+    },
+    {
+      "id": "test-3",
+      "clientName": "Elena Rostova",
+      "role": "Chief Technology Officer",
+      "company": "ZITC Cloud Solutions",
+      "country": "United States",
+      "avatar": "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=200&q=80",
+      "rating": 5,
+      "content": "The 3D interactive web platform that AUB SQUARE engineered blew our clients away. Dwell time on our site quadrupled, and our inbound enterprise quote requests jumped by over 115%. They are masters of both design and cutting-edge WebGL code.",
+      "projectType": "3D WebGL Web Platform"
+    },
+    {
+      "id": "test-4",
+      "clientName": "Marcus Vance",
+      "role": "Global Procurement Lead",
+      "company": "Welmac Engineering",
+      "country": "Germany",
+      "avatar": "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&w=200&q=80",
+      "rating": 5,
+      "content": "Working with Mohammad Shahwaiz and the AUB SQUARE team was effortless. Despite being in different time zones, communication was lightning fast and their UI/UX architecture cut our customer quote procurement cycle by 30%. Highly recommended.",
+      "projectType": "B2B Procurement UI/UX"
+    },
+    {
+      "id": "test-5",
+      "clientName": "Sarah Jenkins",
+      "role": "Founder & CEO",
+      "company": "Lumina Health Lab",
+      "country": "Australia",
+      "avatar": "https://images.unsplash.com/photo-1580489944761-15a19d654956?auto=format&fit=crop&w=200&q=80",
+      "rating": 5,
+      "content": "As a startup founder, you worry about looking small. AUB SQUARE gave our biotech startup the visual credibility of a Fortune 500 company. We won our first major commercial grant two months after launch.",
+      "projectType": "Startup Brand Identity & Web"
+    }
+  ],
+  "faqs": [
+    {
+      "id": "faq-1",
+      "question": "What services does AUB SQUARE provide?",
+      "answer": "AUB SQUARE is a full-service creative agency. We specialize in five core creative disciplines: Brand Identity & Logo Design, Graphic Design, Web & App UI/UX Design, Modern Web Development (including interactive 3D WebGL experiences), and Social Media & Digital Content Creation."
+    },
+    {
+      "id": "faq-2",
+      "question": "How long does a logo or branding project take?",
+      "answer": "A standalone logo and basic visual identity typically takes 7 to 10 business days. Comprehensive brand ecosystems—including complete brand guidelines, typography, stationery kits, and social media suites—usually take 2 to 3 weeks depending on the review pace."
+    },
+    {
+      "id": "faq-3",
+      "question": "How do you work with international clients across different time zones?",
+      "answer": "We work with clients across the USA, UK, Europe, Middle East, and Asia. We structure our communication through dedicated WhatsApp channels, Slack, and scheduled video consultations on Google Meet or Zoom. Our team maintains flexible overlapping hours so you always receive prompt responses."
+    },
+    {
+      "id": "faq-4",
+      "question": "What is your design and revision process?",
+      "answer": "We follow our proven four-step methodology: Discover, Design, Refine, and Deliver. We explore multiple distinct creative directions initially, gather your feedback, and iterate until the solution aligns 100% with your vision and business objectives."
+    },
+    {
+      "id": "faq-5",
+      "question": "Do I get complete copyright ownership and vector source files?",
+      "answer": "Yes, absolutely. Upon final project completion and invoice clearance, you receive 100% full intellectual property copyright ownership. We provide all master source files including vector files (.AI, .EPS, .SVG), print-ready PDFs, high-res PNGs, and digital assets."
+    },
+    {
+      "id": "faq-6",
+      "question": "How do we get started with our project?",
+      "answer": "Getting started is simple! Click the \"Get a Free Quote\" button anywhere on the site or message us directly on WhatsApp at +92-327-2755118. We will discuss your goals, review your scope, and provide a clear timeline and proposal within 24 hours."
+    }
+  ]
+}

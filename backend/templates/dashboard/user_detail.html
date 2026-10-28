@@ -1,0 +1,30 @@
+{% extends "dashboard/base.html" %}
+{% load dash %}
+{% block content %}
+<div class="page-head"><div><h1>{{ u.display_name }}</h1><p>{{ u.email }} · <span class="badge {{ u.status|badge_class }}">{{ u.get_status_display }}</span>{% if u.is_superuser %} <span class="badge b-brand">Super Admin</span>{% endif %}</p></div><div class="actions"><a class="btn" href="{% url 'dashboard:users' %}">← Users</a></div></div>
+<div class="grid g-form">
+  <div class="stack">
+    <section class="card"><div class="card__head"><h2>Account</h2></div><dl class="kv">
+      <dt>Role</dt><dd>{{ u.role|default:"—" }}</dd><dt>Job title</dt><dd>{{ u.job_title|default:"—" }}</dd><dt>Phone</dt><dd>{{ u.phone|default:"—" }}</dd>
+      <dt>Email verified</dt><dd>{% if u.email_verified %}Yes{% else %}No{% endif %}</dd><dt>Joined</dt><dd>{{ u.date_joined|date:"d M Y, H:i" }}</dd><dt>Last sign-in</dt><dd>{{ u.last_login|date:"d M Y, H:i"|default:"Never" }}</dd>
+      {% if u.approved_by %}<dt>Approved by</dt><dd>{{ u.approved_by.display_name }} · {{ u.approved_at|date:"d M Y" }}</dd>{% endif %}{% if u.status_note %}<dt>Note</dt><dd>{{ u.status_note }}</dd>{% endif %}</dl></section>
+    <section class="card"><div class="card__head"><h2>Recent activity</h2></div><ul class="timeline">{% for a in logs %}<li><div class="small"><b>{{ a.action|pretty_action }}</b> {{ a.target_repr }}</div><div class="muted tiny">{{ a.created_at|timesince }} ago · {{ a.actor_label }}</div></li>{% empty %}<li class="muted small">No activity recorded.</li>{% endfor %}</ul></section>
+  </div>
+  <aside class="stack">
+    {% if is_super and not is_self %}
+    <section class="card"><div class="card__head"><h3>Manage</h3></div>
+      <form method="post" action="{% url 'dashboard:user_action' u.pk %}" class="stack-sm">{% csrf_token %}
+        <label class="lbl" for="role">Role</label><select class="input" id="role" name="role"><option value="">Select a role…</option>{% for r in roles %}<option value="{{ r.pk }}" {% if u.role_id == r.pk %}selected{% endif %}>{{ r.name }}</option>{% endfor %}</select>
+        {% if u.status == 'pending' or u.status == 'rejected' %}<button class="btn btn-ok btn-block" name="action" value="approve" type="submit">{% icon "check" 16 %} Approve with this role</button>{% elif not u.is_superuser %}<button class="btn btn-block" name="action" value="role" type="submit">Change role</button>{% endif %}
+        {% if u.status == 'pending' %}<input class="input" name="reason" placeholder="Reason (optional, emailed to the user)" maxlength="300"><button class="btn btn-danger btn-block" name="action" value="reject" type="submit" data-confirm="Reject this account request?" data-confirm-title="Reject request">Reject request</button>{% endif %}
+        {% if u.status == 'approved' and not u.is_superuser %}<input class="input" name="reason" placeholder="Reason for suspension (optional)" maxlength="300"><button class="btn btn-danger btn-block" name="action" value="suspend" type="submit" data-confirm="Suspend this user? They are signed out immediately and cannot sign in again until reactivated." data-confirm-title="Suspend user">Suspend &amp; sign out</button>{% endif %}
+        {% if u.status == 'suspended' %}<button class="btn btn-ok btn-block" name="action" value="reactivate" type="submit">Reactivate</button>{% endif %}
+        {% if u.status == 'approved' %}<button class="btn btn-block" name="action" value="logout" type="submit">Sign out of all devices</button>{% endif %}
+        {% if can_delete %}<button class="btn btn-danger btn-block" name="action" value="delete" type="submit" data-confirm="Permanently delete this user? Their past activity stays in the log." data-confirm-title="Delete user">{% icon "trash" 16 %} Delete user</button>{% endif %}
+      </form></section>
+    {% elif is_self %}<section class="card"><p class="muted">This is your own account. Manage it from <a href="{% url 'accounts:profile' %}">My profile</a>.</p></section>
+    {% else %}<section class="card"><p class="muted">Only a Super Admin can approve, suspend or change users.</p></section>{% endif %}
+    {% if u.role %}<section class="card"><div class="card__head"><h3>Role access</h3></div><ul class="list small">{% for key, label in modules %}{% with acts=u.role.permissions|get_item:key %}{% if acts %}<li><span class="grow">{{ label }}</span><span class="muted tiny">{{ acts|join:", " }}</span></li>{% endif %}{% endwith %}{% endfor %}</ul></section>{% endif %}
+  </aside>
+</div>
+{% endblock %}

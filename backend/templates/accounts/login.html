@@ -1,0 +1,13 @@
+{% extends "accounts/base_auth.html" %}
+{% block body %}
+<h1>Welcome back</h1><p class="sub">Sign in to manage the AUB SQUARE website and business.</p>
+{% if notice %}<div class="alert alert--warn" style="margin-bottom:16px" role="alert">{{ notice }}</div>{% endif %}
+<form method="post" novalidate>{% csrf_token %}
+  {% if form.non_field_errors %}<div class="alert alert--bad" style="margin-bottom:14px" role="alert">{{ form.non_field_errors.0 }}</div>{% endif %}
+  <input type="hidden" name="next" value="{{ next }}">
+  {% include "accounts/_field.html" with field=form.email %}
+  {% include "accounts/_field.html" with field=form.password %}
+  <button class="btn btn-primary btn-block" type="submit">Sign in</button>
+</form>
+<div class="auth-foot"><a href="{% url 'accounts:reset' %}">Forgot password?</a><a href="{% url 'accounts:register' %}">Request staff access</a></div>
+{% endblock %}

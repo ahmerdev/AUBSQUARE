@@ -1,0 +1,10 @@
+{% extends "accounts/base_auth.html" %}
+{% block title %}Reset password{% endblock %}
+{% block body %}
+<h1>Reset your password</h1><p class="sub">Enter your work email. If it belongs to an active account, we'll send a one-time link that expires in one hour.</p>
+<form method="post" novalidate>{% csrf_token %}
+  {% include "accounts/_field.html" with field=form.email %}
+  <button class="btn btn-primary btn-block" type="submit">Send reset link</button>
+</form>
+<div class="auth-foot"><a href="{% url 'accounts:login' %}">← Back to sign in</a></div>
+{% endblock %}

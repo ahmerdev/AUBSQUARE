@@ -1,0 +1,3 @@
+{% extends "dashboard/base.html" %}
+{% load dash %}
+{% block content %}<div class="empty" style="padding:80px 20px">{% icon "search" 44 %}<h2>Page not found</h2><p>That page doesn't exist or was moved.</p><a class="btn btn-primary" href="{% url 'dashboard:home' %}">Back to dashboard</a></div>{% endblock %}

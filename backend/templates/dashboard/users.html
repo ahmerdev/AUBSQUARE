@@ -1,0 +1,19 @@
+{% extends "dashboard/base.html" %}
+{% load dash %}
+{% block content %}
+<div class="page-head"><div><h1>Users &amp; roles</h1><p>New accounts stay <b>Pending</b> until a Super Admin approves them. Permissions are enforced on the server for every action.</p></div>
+  <div class="actions"><a class="btn" href="{% url 'dashboard:roles' %}">{% icon "shield" 16 %} Roles &amp; permissions</a>{% if is_super %}<a class="btn btn-primary" href="{% url 'dashboard:invite' %}">{% icon "plus" 16 %} Invite user</a>{% endif %}</div></div>
+<div class="tabs" style="margin-bottom:14px"><a href="?" class="{% if not status %}active{% endif %}">All <span class="n">{{ total }}</span></a>{% for k, l in statuses %}<a href="?status={{ k }}" class="{% if status == k %}active{% endif %}">{{ l }} <span class="n">{{ counts|get_item:k }}</span></a>{% endfor %}</div>
+<div class="card card--flush">
+  <form class="toolbar" method="get">{% if status %}<input type="hidden" name="status" value="{{ status }}">{% endif %}<div class="grow"><input class="input" type="search" name="q" value="{{ q }}" placeholder="Search name or email…"></div><button class="btn btn-sm">Search</button></form>
+  {% if page.object_list %}<div class="table-wrap"><table class="t table--stack"><thead><tr><th>User</th><th>Role</th><th>Status</th><th>Email</th><th>Joined</th><th></th></tr></thead><tbody>
+  {% for u in page.object_list %}<tr>
+    <td class="title" data-label="User"><div style="display:flex;gap:10px;align-items:center"><span class="avatar" style="width:34px;height:34px;font-size:12px">{{ u.initials }}</span><div><a href="{% url 'dashboard:user_detail' u.pk %}">{{ u.display_name }}</a>{% if u.is_superuser %} <span class="badge b-brand">Super Admin</span>{% endif %}</div></div></td>
+    <td data-label="Role">{{ u.role|default:"—" }}</td><td data-label="Status"><span class="badge {{ u.status|badge_class }}">{{ u.get_status_display }}</span></td>
+    <td data-label="Email" class="small">{{ u.email }}{% if not u.email_verified %} <span class="badge b-muted" title="Email not verified">unverified</span>{% endif %}</td><td data-label="Joined" class="nowrap">{{ u.date_joined|date:"d M Y" }}</td>
+    <td class="nolabel"><div class="row-actions"><a class="btn btn-sm" href="{% url 'dashboard:user_detail' u.pk %}">{% if u.status == 'pending' and is_super %}Review{% else %}Open{% endif %}</a></div></td></tr>{% endfor %}</tbody></table></div>
+  {% include "dashboard/_pagination.html" %}{% else %}<div class="empty">{% icon "users" 36 %}<h3>No users found</h3></div>{% endif %}
+</div>
+{% if invites %}<section class="card" style="margin-top:16px"><div class="card__head"><h2>Pending invitations</h2></div><ul class="list">{% for i in invites %}<li><div class="grow"><b>{{ i.email }}</b><div class="muted small">{{ i.role|default:"No role" }} · invited by {{ i.invited_by.display_name|default:"—" }} · {% if i.expires_at < now %}<span class="trend-down">expired</span>{% else %}expires {{ i.expires_at|date:"d M" }}{% endif %}{% if i.pre_approved %} · auto-approve{% endif %}</div></div>
+  {% if is_super %}<form method="post" action="{% url 'dashboard:invite_revoke' i.pk %}">{% csrf_token %}<button class="btn btn-sm btn-danger" type="submit" data-confirm="Revoke this invitation?">Revoke</button></form>{% endif %}</li>{% endfor %}</ul></section>{% endif %}
+{% endblock %}

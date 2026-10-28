@@ -1,0 +1,10 @@
+{% extends "dashboard/base.html" %}
+{% block content %}
+<div class="page-head"><div><h1>Import subscribers</h1><p>Only add people who agreed to receive marketing email from you. Duplicates and invalid addresses are skipped.</p></div></div>
+<form method="post" class="card" style="max-width:720px">{% csrf_token %}
+  <div class="field"><label class="lbl" for="emails">Email addresses</label><textarea class="input" id="emails" name="emails" rows="10" placeholder="one per line, or separated by commas" required></textarea></div>
+  <div class="field"><label class="lbl" for="source">Where did they give consent?</label><input class="input" id="source" name="source" maxlength="120" placeholder="e.g. Event sign-up sheet, March 2026"></div>
+  <label class="field field--check"><input type="checkbox" name="consent" value="1" required> <span>I confirm these contacts gave consent to receive marketing email.</span></label>
+  <div class="actions"><button class="btn btn-primary" type="submit">Import</button><a class="btn" href="{% url 'dashboard:list' 'subscribers' %}">Cancel</a></div>
+</form>
+{% endblock %}

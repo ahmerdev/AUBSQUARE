@@ -1,0 +1,15 @@
+{% extends "dashboard/base.html" %}
+{% load dash %}
+{% block content %}
+<div class="page-head"><div><h1>Notifications</h1><p>New leads, comments, chats, approvals and delivery problems appear here.</p></div>
+  <div class="actions"><form method="post" action="{% url 'dashboard:notifications_read_all' %}">{% csrf_token %}<button class="btn" type="submit">Mark all as read</button></form></div></div>
+<div class="tabs" style="margin-bottom:14px"><a href="?" class="{% if not filter %}active{% endif %}">All</a><a href="?filter=unread" class="{% if filter == 'unread' %}active{% endif %}">Unread</a></div>
+<div class="card card--flush">
+{% if page.object_list %}<ul class="list">{% for n in page.object_list %}
+  <li class="{% if not n.is_read %}unread{% endif %}"><span class="dot dot--{{ n.level }}"></span>
+    <div class="grow"><form method="post" action="{% url 'dashboard:notification_read' n.pk %}">{% csrf_token %}<button type="submit" style="all:unset;cursor:pointer;display:block;width:100%"><b>{{ n.title }}</b>{% if n.body %}<div class="muted small">{{ n.body }}</div>{% endif %}</button></form></div>
+    <span class="muted tiny nowrap">{{ n.created_at|timesince }} ago</span></li>{% endfor %}</ul>
+  {% include "dashboard/_pagination.html" %}
+{% else %}<div class="empty">{% icon "bell" 36 %}<h3>You're all caught up</h3><p>{% if filter %}No unread notifications.{% else %}Nothing has happened yet.{% endif %}</p></div>{% endif %}
+</div>
+{% endblock %}

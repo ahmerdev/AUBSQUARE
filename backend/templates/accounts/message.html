@@ -1,0 +1,6 @@
+{% extends "accounts/base_auth.html" %}
+{% block title %}{{ title }}{% endblock %}
+{% block body %}
+<h1>{{ title }}</h1><p class="sub">{{ text }}</p>
+<a class="btn {% if login %}btn-primary{% endif %} btn-block" href="{% url 'accounts:login' %}">Go to sign in</a>
+{% endblock %}

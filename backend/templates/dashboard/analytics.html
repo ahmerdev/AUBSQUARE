@@ -1,0 +1,28 @@
+{% extends "dashboard/base.html" %}
+{% load dash %}
+{% block content %}
+<div class="page-head"><div><h1>Analytics &amp; reports</h1><p>Everything here is counted from this site's own database. Visitors are anonymised; Do-Not-Track and bots are excluded.</p></div>
+  <div class="actions"><div class="tabs"><a href="?range=7" class="{% if range == '7' %}active{% endif %}">7 days</a><a href="?range=30" class="{% if range == '30' %}active{% endif %}">30 days</a><a href="?range=90" class="{% if range == '90' %}active{% endif %}">90 days</a></div>
+  {% if can_export %}<a class="btn" href="{% url 'dashboard:analytics_export' %}?range={{ range }}">{% icon "download" 16 %} Export CSV</a>{% endif %}</div></div>
+<div class="grid g4" style="margin-bottom:16px">
+  <div class="card stat"><div class="stat__label">Page views</div><div class="stat__value">{{ total_views }}</div><div class="stat__foot">last {{ days }} days</div></div>
+  <div class="card stat"><div class="stat__label">Unique visitors</div><div class="stat__value">{{ visitors }}</div><div class="stat__foot">approximate</div></div>
+  <div class="card stat"><div class="stat__label">Leads</div><div class="stat__value">{{ lead_count }}</div><div class="stat__foot">spam excluded</div></div>
+  <div class="card stat"><div class="stat__label">Visitor → lead</div><div class="stat__value">{% if conversion is not None %}{{ conversion }}%{% else %}—{% endif %}</div><div class="stat__foot">{% if conversion is None %}needs visits to calculate{% else %}leads ÷ visitors{% endif %}</div></div>
+</div>
+<div class="grid g2" style="margin-bottom:16px">
+  <section class="card"><div class="card__head"><h2>Traffic</h2></div>{% if total_views %}<div class="chart"><canvas data-chart="c-traffic" aria-label="Traffic"></canvas></div>{% else %}<div class="empty">{% icon "pulse" 34 %}<h3>No traffic recorded yet</h3><p>Visits appear as people browse the live site.</p></div>{% endif %}<script type="application/json" id="c-traffic">{{ charts.traffic|to_json }}</script></section>
+  <section class="card"><div class="card__head"><h2>Leads per day</h2></div>{% if lead_count %}<div class="chart"><canvas data-chart="c-leads" aria-label="Leads"></canvas></div>{% else %}<div class="empty">{% icon "inbox" 34 %}<h3>No leads in this period</h3></div>{% endif %}<script type="application/json" id="c-leads">{{ charts.leads|to_json }}</script></section>
+</div>
+<div class="grid g3">
+  <section class="card"><div class="card__head"><h3>Top pages</h3></div>{% if top_pages %}<ul class="list">{% for p in top_pages %}<li><span class="grow mono small ellipsis">{{ p.path }}</span><b>{{ p.n }}</b></li>{% endfor %}</ul>{% else %}<p class="muted small">No data yet.</p>{% endif %}</section>
+  <section class="card"><div class="card__head"><h3>Referrers</h3></div>{% if referrers %}<ul class="list">{% for p in referrers %}<li><span class="grow ellipsis">{{ p.referrer_domain }}</span><b>{{ p.n }}</b></li>{% endfor %}</ul>{% else %}<p class="muted small">No external referrers recorded.</p>{% endif %}</section>
+  <section class="card"><div class="card__head"><h3>Devices</h3></div>{% if devices %}<ul class="list">{% for p in devices %}<li><span class="grow">{{ p.device|default:"unknown"|capfirst }}</span><b>{{ p.n }}</b></li>{% endfor %}</ul>{% else %}<p class="muted small">No data yet.</p>{% endif %}</section>
+  <section class="card"><div class="card__head"><h3>Campaign tags (UTM)</h3></div>{% if utm %}<ul class="list">{% for p in utm %}<li><span class="grow small ellipsis">{{ p.utm_source }}{% if p.utm_medium %} / {{ p.utm_medium }}{% endif %}{% if p.utm_campaign %} / {{ p.utm_campaign }}{% endif %}</span><b>{{ p.n }}</b></li>{% endfor %}</ul>{% else %}<p class="muted small">No tagged visits yet.</p>{% endif %}</section>
+  <section class="card"><div class="card__head"><h3>Lead sources</h3></div>{% if lead_sources %}<ul class="list">{% for p in lead_sources %}<li><span class="grow">{{ p.source|capfirst }}</span><b>{{ p.n }}</b></li>{% endfor %}</ul>{% else %}<p class="muted small">No leads yet.</p>{% endif %}</section>
+  <section class="card"><div class="card__head"><h3>Leads by service</h3></div>{% if lead_services %}<ul class="list">{% for p in lead_services %}<li><span class="grow ellipsis">{{ p.service_label }}</span><b>{{ p.n }}</b></li>{% endfor %}</ul>{% else %}<p class="muted small">No leads yet.</p>{% endif %}</section>
+  <section class="card"><div class="card__head"><h3>Leads by budget</h3></div>{% if lead_budgets %}<ul class="list">{% for p in lead_budgets %}<li><span class="grow ellipsis">{{ p.budget_label }}</span><b>{{ p.n }}</b></li>{% endfor %}</ul>{% else %}<p class="muted small">No leads yet.</p>{% endif %}</section>
+  <section class="card"><div class="card__head"><h3>Lead pipeline</h3></div><ul class="list">{% for label, n in status_counts %}<li><span class="grow">{{ label }}</span><b>{{ n }}</b></li>{% endfor %}</ul></section>
+  <section class="card"><div class="card__head"><h3>Leads by campaign</h3></div>{% if lead_utm %}<ul class="list">{% for p in lead_utm %}<li><span class="grow small ellipsis">{{ p.utm_source }}{% if p.utm_campaign %} / {{ p.utm_campaign }}{% endif %}</span><b>{{ p.n }}</b></li>{% endfor %}</ul>{% else %}<p class="muted small">No tagged leads yet.</p>{% endif %}</section>
+</div>
+{% endblock %}

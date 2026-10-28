@@ -1,0 +1,50 @@
+{% extends "dashboard/base.html" %}
+{% load dash %}
+{% block content %}
+<form method="post" data-warn-unsaved novalidate>{% csrf_token %}
+<div class="page-head"><div><h1>Email settings</h1><p>Connect the mailbox used for lead notifications, replies and account emails. Passwords are encrypted and never shown again.</p></div></div>
+{% if form.errors %}<div class="alert alert--bad" style="margin-bottom:14px">Please fix the highlighted fields.</div>{% endif %}
+<div class="grid g-form">
+  <div class="stack">
+    <section class="card"><div class="card__head"><h2>Outgoing mail (SMTP)</h2>{% if es.smtp_configured %}<span class="badge {% if es.last_test_ok %}b-ok{% elif es.last_test_ok is None %}b-info{% else %}b-bad{% endif %}">{% if es.last_test_ok %}Tested OK{% elif es.last_test_ok is None %}Not tested yet{% else %}Last test failed{% endif %}</span>{% else %}<span class="badge b-warn">Not configured</span>{% endif %}</div>
+      <div class="fgrid">
+        <div class="field field--wide"><label class="lbl" for="id_provider">Provider</label>{{ form.provider }}<div class="help" id="provider-note">{{ provider_note }}</div></div>
+        <div class="field"><label class="lbl" for="id_smtp_host">SMTP host</label>{{ form.smtp_host }}{{ form.smtp_host.errors }}</div>
+        <div class="field"><label class="lbl" for="id_smtp_port">Port</label>{{ form.smtp_port }}{{ form.smtp_port.errors }}</div>
+        <div class="field"><label class="lbl" for="id_smtp_security">Security</label>{{ form.smtp_security }}</div>
+        <div class="field"><label class="lbl" for="id_smtp_username">Username</label>{{ form.smtp_username }}</div>
+        <div class="field field--wide"><label class="lbl" for="id_smtp_password">Password / app password</label>{{ form.smtp_password }}<div class="help">{% if es.has_smtp_password %}A password is saved (encrypted). Leave blank to keep it.{% else %}No password saved yet. Gmail and Microsoft 365 generally require an app password.{% endif %}</div></div>
+        <div class="field"><label class="lbl" for="id_from_email">From address</label>{{ form.from_email }}{{ form.from_email.errors }}</div>
+        <div class="field"><label class="lbl" for="id_from_name">From name</label>{{ form.from_name }}</div>
+        <div class="field field--wide"><label class="lbl" for="id_reply_to">Reply-to (optional)</label>{{ form.reply_to }}{{ form.reply_to.errors }}</div>
+      </div></section>
+    <section class="card" id="imap"><div class="card__head"><h2>Incoming mail (IMAP) — optional</h2>{% if es.imap_configured %}<span class="badge {% if es.last_sync_ok %}b-ok{% elif es.last_sync_ok is None %}b-info{% else %}b-bad{% endif %}">{% if es.last_sync_ok %}Syncing{% elif es.last_sync_ok is None %}Not synced yet{% else %}Last sync failed{% endif %}</span>{% else %}<span class="badge b-muted">Off</span>{% endif %}</div>
+      <p class="muted small">SMTP can only send. To see customer replies in the dashboard, enable IMAP. We open the folder read-only and never delete or move your mail.</p>
+      <div class="fgrid">
+        <div class="field field--check field--wide">{{ form.imap_enabled }}<div><label for="id_imap_enabled">Enable inbox sync</label></div></div>
+        <div class="field"><label class="lbl" for="id_imap_host">IMAP host</label>{{ form.imap_host }}</div><div class="field"><label class="lbl" for="id_imap_port">Port</label>{{ form.imap_port }}</div>
+        <div class="field"><label class="lbl" for="id_imap_security">Security</label>{{ form.imap_security }}</div><div class="field"><label class="lbl" for="id_imap_username">Username</label>{{ form.imap_username }}</div>
+        <div class="field"><label class="lbl" for="id_imap_password">Password / app password</label>{{ form.imap_password }}<div class="help">{% if es.has_imap_password %}Saved (encrypted).{% else %}Not saved yet.{% endif %}</div></div><div class="field"><label class="lbl" for="id_imap_folder">Folder</label>{{ form.imap_folder }}</div>
+      </div>
+      {% if es.last_sync_message %}<p class="muted small">Last sync: {{ es.last_sync_message }} {% if es.last_sync_at %}({{ es.last_sync_at|timesince }} ago){% endif %}</p>{% endif %}
+    </section>
+    <section class="card"><div class="card__head"><h2>Staff notifications</h2></div>
+      <div class="field"><label class="lbl" for="id_notification_recipients">Send notifications to</label>{{ form.notification_recipients }}<div class="help">One email per line. Leave empty to notify all Super Admins.</div></div>
+      <div class="fgrid">{% for f in form %}{% if f.name|slice:":7" == "notify_" %}<div class="field field--check">{{ f }}<div><label for="{{ f.id_for_label }}">{{ f.label }}</label></div></div>{% endif %}{% endfor %}</div></section>
+  </div>
+  <aside class="stack">
+    <section class="card"><div class="card__head"><h3>Send a test email</h3></div>
+      <p class="muted small">Nothing is sent until you press the button below. Save your settings first.</p>
+      {% if can_manage %}<div class="stack-sm"><input form="f-email-test" class="input" type="email" name="to" placeholder="Send the test to…" value="{{ request.user.email }}" required><button form="f-email-test" class="btn btn-primary btn-block" type="submit" data-keep data-confirm="Send one real test email to the address entered?" data-confirm-title="Send test email" {% if not es.smtp_configured %}disabled{% endif %}>{% icon "send" 16 %} Send test email</button></div>{% endif %}
+      {% if es.last_test_at %}<div class="hint-box" style="margin-top:12px">Last test {{ es.last_test_at|timesince }} ago: <b class="{% if es.last_test_ok %}trend-up{% else %}trend-down{% endif %}">{{ es.last_test_message }}</b></div>{% endif %}
+      {% if can_manage and es.imap_enabled %}<div style="margin-top:12px"><button form="f-imap-test" class="btn btn-block" type="submit" data-keep>{% icon "refresh" 16 %} Test inbox connection</button></div>{% endif %}
+    </section>
+    <section class="card"><div class="card__head"><h3>Good to know</h3></div><ul class="small muted" style="padding-left:18px;margin:0"><li>Gmail / Workspace: turn on 2-Step Verification and create an App password.</li><li>Microsoft 365 may require an admin to allow SMTP AUTH.</li><li>Failed emails are retried automatically with back-off and are visible in the Outbox.</li><li>For production, schedule <code>python manage.py process_email_queue</code> every minute.</li></ul></section>
+  </aside>
+</div>
+{% if can_manage %}<div class="sticky-save"><button class="btn btn-primary" type="submit">{% icon "check" 16 %} Save settings</button><span class="muted small">Saving never sends an email.</span></div>{% endif %}
+</form>
+{% if can_manage %}<form id="f-email-test" method="post" action="{% url 'dashboard:email_test' %}" hidden>{% csrf_token %}</form>
+<form id="f-imap-test" method="post" action="{% url 'dashboard:imap_test' %}" hidden>{% csrf_token %}</form>{% endif %}
+{% endblock %}
+{% block js %}<script>window.__presets = {{ presets_json|safe }};</script>{% endblock %}

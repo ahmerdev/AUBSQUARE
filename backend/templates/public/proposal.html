@@ -1,0 +1,46 @@
+{% load humanize %}<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex,nofollow,noarchive"><meta name="referrer" content="same-origin">
+<title>{{ pr.title }} — {{ brand.name }}</title>
+{{ brand.fonts_html }}
+<style>
+:root{--bg:#0B0B12;--card:#15112a;--line:rgba(255,255,255,.1);--tx:#fff;--mu:#b8b4c9;--a:#EC008C;--b:#7B2FFF;--ok:#35d49a}
+@media(prefers-color-scheme:light){:root{--bg:#f5f4fa;--card:#fff;--line:rgba(20,10,60,.12);--tx:#150f2e;--mu:#5d5878}}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--tx);font-family:var(--font-body,system-ui,sans-serif);line-height:1.6}
+h1,h2,h3{font-family:var(--font-heading,inherit);line-height:1.15;margin:0 0 12px}.wrap{max-width:860px;margin:0 auto;padding:28px 18px 80px}
+.top{display:flex;align-items:center;gap:12px;justify-content:space-between;margin-bottom:28px}.top img{height:38px}.brand{font-weight:700;font-size:20px}
+.hero{background:linear-gradient(135deg,rgba(236,0,140,.18),rgba(123,47,255,.18));border:1px solid var(--line);border-radius:26px;padding:32px;margin-bottom:22px}.hero h1{font-size:clamp(26px,5vw,40px)}
+.meta{color:var(--mu);font-size:14px;display:flex;gap:16px;flex-wrap:wrap}.card{background:var(--card);border:1px solid var(--line);border-radius:22px;padding:24px;margin-bottom:18px}
+table{width:100%;border-collapse:collapse}th{text-align:left;color:var(--mu);font-size:12.5px;text-transform:uppercase;letter-spacing:.06em;padding:8px 6px;border-bottom:1px solid var(--line)}td{padding:12px 6px;border-bottom:1px solid var(--line);vertical-align:top}td.n,th.n{text-align:right;white-space:nowrap}
+.sub{color:var(--mu);font-size:13.5px}.total td{font-weight:700;font-size:18px;border-bottom:0}.pre{white-space:pre-wrap}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:14px}.proof{border:1px solid var(--line);border-radius:16px;overflow:hidden;background:rgba(127,127,127,.06)}.proof img{width:100%;height:140px;object-fit:cover;display:block}.proof div{padding:12px 14px}
+.q{border-left:3px solid var(--a);padding-left:14px;margin:0 0 14px}
+input,textarea{width:100%;background:transparent;border:1px solid var(--line);color:var(--tx);border-radius:12px;padding:12px;font:inherit;margin-bottom:10px}
+.btn{border:0;border-radius:14px;padding:14px 26px;font-weight:700;font-size:16px;cursor:pointer;color:#fff;background:linear-gradient(90deg,var(--a),var(--b))}.btn.alt{background:transparent;border:1px solid var(--line);color:var(--tx);font-weight:600}
+.banner{border-radius:16px;padding:14px 18px;margin-bottom:18px;border:1px solid var(--line)}.banner.ok{background:rgba(53,212,154,.12);border-color:var(--ok)}.banner.warn{background:rgba(255,180,0,.12);border-color:#ffb400}
+.foot{color:var(--mu);font-size:12.5px;text-align:center;margin-top:30px}.actions{display:flex;gap:10px;flex-wrap:wrap}
+@media print{body{background:#fff;color:#000}.card,.hero{border-color:#ccc;background:#fff}.noprint{display:none}}
+</style></head><body><div class="wrap">
+<div class="top">{% if brand.logo %}<img src="{{ brand.logo }}" alt="{{ brand.name }}">{% else %}<span class="brand">{{ brand.name }}</span>{% endif %}<span class="sub">Proposal {{ pr.reference }}</span></div>
+{% if preview %}<div class="banner warn noprint">Preview – this is how your client sees it. Views from here are not counted.</div>{% endif %}
+{% if notice == 'accepted' %}<div class="banner ok"><b>Thank you!</b> We've been told you'd like to go ahead. Our team will contact you shortly to confirm the details and the start date. (This does not commit you to payment yet.)</div>
+{% elif notice == 'declined' %}<div class="banner">Thanks for letting us know. If anything changes, just reply to our email.</div>
+{% elif notice == 'question' %}<div class="banner ok">Your question was sent – we'll reply by email soon.</div>{% endif %}
+{% if pr.status == 'accept_requested' and not notice %}<div class="banner ok">You told us you'd like to go ahead. Our team will be in touch to confirm.</div>{% endif %}
+{% if pr.status == 'expired' %}<div class="banner warn">This proposal expired on {{ pr.valid_until|date:"j F Y" }}. Please contact us for an updated one.</div>{% endif %}
+{% if pr.status == 'won' %}<div class="banner ok">This proposal has been confirmed. Thank you for choosing {{ brand.name }}!</div>{% endif %}
+<div class="hero"><div class="sub">Prepared for {{ pr.client_name }}{% if pr.client_company %} · {{ pr.client_company }}{% endif %}</div><h1>{{ pr.title }}</h1>{% if pr.client_website %}<div class="sub">Website: {{ pr.client_website }}</div>{% endif %}<div class="meta"><span>Issued {{ pr.sent_at|default:pr.created_at|date:"j F Y" }}</span>{% if pr.valid_until %}<span>Valid until {{ pr.valid_until|date:"j F Y" }}</span>{% endif %}</div></div>
+{% if pr.intro %}<div class="card"><div class="pre">{{ pr.intro }}</div></div>{% endif %}
+<div class="card"><h2>Investment</h2><table><thead><tr><th>Item</th><th class="n">Qty</th><th class="n">Price</th><th class="n">Total</th></tr></thead><tbody>
+{% for i in items %}<tr><td><b>{{ i.description }}</b>{% if i.detail %}<div class="sub">{{ i.detail }}</div>{% endif %}</td><td class="n">{{ i.quantity|floatformat:"-2" }}</td><td class="n">{{ i.unit_price|floatformat:2|intcomma }}</td><td class="n">{{ i.total|floatformat:2|intcomma }}</td></tr>{% endfor %}
+{% if pr.discount %}<tr><td colspan="3" class="n sub">Discount</td><td class="n">-{{ pr.discount|floatformat:2|intcomma }}</td></tr>{% endif %}
+{% if pr.tax_percent %}<tr><td colspan="3" class="n sub">Tax ({{ pr.tax_percent|floatformat:"-2" }}%)</td><td class="n">{{ pr.tax_amount|floatformat:2|intcomma }}</td></tr>{% endif %}
+<tr class="total"><td colspan="3" class="n">Total ({{ pr.currency }})</td><td class="n">{{ pr.total|floatformat:2|intcomma }}</td></tr></tbody></table></div>
+{% if pr.scope %}<div class="card"><h2>What's included</h2><div class="pre">{{ pr.scope }}</div></div>{% endif %}
+{% if projects or cases %}<div class="card"><h2>Recent work</h2><div class="grid">{% for p in projects %}<div class="proof">{% if p.thumbnail %}<img src="{{ p.thumbnail }}" alt="{{ p.thumbnail_alt|default:p.title }}" loading="lazy">{% endif %}<div><b>{{ p.title }}</b><div class="sub">{{ p.summary|truncatechars:110 }}</div></div></div>{% endfor %}
+{% for c in cases %}<div class="proof">{% if c.hero_image %}<img src="{{ c.hero_image }}" alt="{{ c.hero_alt|default:c.title }}" loading="lazy">{% endif %}<div><b>{{ c.title }}</b><div class="sub">Case study · {{ c.client }}</div></div></div>{% endfor %}</div></div>{% endif %}
+{% if testimonials %}<div class="card"><h2>What clients say</h2>{% for t in testimonials %}<blockquote class="q">“{{ t.content|truncatechars:240 }}”<div class="sub">— {{ t.client_name }}{% if t.company %}, {{ t.company }}{% endif %}</div></blockquote>{% endfor %}</div>{% endif %}
+{% if pr.terms %}<div class="card"><h2>Terms</h2><div class="pre sub">{{ pr.terms }}</div></div>{% endif %}
+{% if can_respond %}<div class="card noprint"><h2>Ready to go ahead?</h2><p class="sub">Tell us and our team will contact you to confirm the start date and payment. Clicking the button below is a request, not a payment or a signed contract.</p>
+<form method="post">{% csrf_token %}<input name="name" placeholder="Your name" value="{{ pr.client_name }}" maxlength="160"><textarea name="note" rows="3" placeholder="Anything we should know, or a question? (optional)" maxlength="600"></textarea>
+<div class="actions"><button class="btn" name="action" value="accept">Yes, I'd like to go ahead</button><button class="btn alt" name="action" value="question">Send a question</button><button class="btn alt" name="action" value="decline" onclick="return confirm('Decline this proposal?')">Not right now</button></div></form></div>{% endif %}
+<div class="foot noprint"><a href="javascript:window.print()" style="color:inherit">Save or print this proposal</a><br>This private link was shared with you by {{ brand.name }}.</div>
+</div></body></html>

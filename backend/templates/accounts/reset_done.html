@@ -1,0 +1,5 @@
+{% extends "accounts/base_auth.html" %}
+{% block title %}Password updated{% endblock %}
+{% block body %}
+<h1>Password updated</h1><p class="sub">You can now sign in with your new password.</p><a class="btn btn-primary btn-block" href="{% url 'accounts:login' %}">Sign in</a>
+{% endblock %}

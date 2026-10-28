@@ -1,0 +1,15 @@
+Django>=5.2.18,<5.3
+djangorestframework>=3.16,<3.17
+django-cors-headers>=4.9,<5
+nh3>=0.3.7
+Pillow>=11.0
+cryptography>=44
+python-dotenv>=1.0
+whitenoise>=6.9
+gunicorn>=23
+# PostgreSQL (production) - install only when DB_ENGINE=postgres
+psycopg[binary]>=3.2
+
+# Invoice / receipt PDFs
+reportlab>=4.2
+requests>=2.32

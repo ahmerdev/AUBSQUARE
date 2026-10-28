@@ -1,0 +1,13 @@
+{% load dash %}
+{% if page.paginator.num_pages > 1 or page.paginator.count %}
+<div class="pager">
+  <span>{% if page.paginator.count %}Showing {{ page.start_index }}–{{ page.end_index }} of {{ page.paginator.count }}{% else %}No results{% endif %}</span>
+  {% if page.paginator.num_pages > 1 %}
+  <nav class="pages" aria-label="Pagination">
+    {% if page.has_previous %}<a href="?{% qs_replace qs page=page.previous_page_number %}" aria-label="Previous page">←</a>{% endif %}
+    {% for n in page.paginator.page_range %}{% if n == page.number %}<span class="cur" aria-current="page">{{ n }}</span>{% elif n <= 2 or n > page.paginator.num_pages|add:"-2" or n >= page.number|add:"-1" and n <= page.number|add:"1" %}<a href="?{% qs_replace qs page=n %}">{{ n }}</a>{% elif n == 3 or n == page.paginator.num_pages|add:"-2" %}<span class="muted">…</span>{% endif %}{% endfor %}
+    {% if page.has_next %}<a href="?{% qs_replace qs page=page.next_page_number %}" aria-label="Next page">→</a>{% endif %}
+  </nav>
+  {% endif %}
+</div>
+{% endif %}

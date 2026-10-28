@@ -1,0 +1,32 @@
+{% extends "dashboard/base.html" %}
+{% load dash %}
+{% block content %}
+<div class="page-head"><div><h1>Email inbox</h1><p>Replies from customers (via IMAP sync), your outgoing messages and delivery status. SMTP only <em>sends</em>; connect IMAP in Email settings to receive.</p></div>
+  <div class="actions">
+    {% if can_sync and es.imap_configured %}<form method="post" action="{% url 'dashboard:inbox_sync' %}">{% csrf_token %}<button class="btn" type="submit">{% icon "refresh" 16 %} Sync inbox</button></form>{% endif %}
+    {% if can_sync %}<form method="post" action="{% url 'dashboard:outbox_process' %}">{% csrf_token %}<button class="btn" type="submit">{% icon "send" 16 %} Process outbox</button></form>{% endif %}
+    {% if can_compose %}<a class="btn btn-primary" href="{% url 'dashboard:compose' %}">{% icon "plus" 16 %} Compose</a>{% endif %}
+  </div></div>
+{% if not es.smtp_configured %}<div class="alert alert--warn" style="margin-bottom:14px">{% icon "alert" 18 %}<div>Outgoing email isn't configured, so replies can't be delivered. <a href="{% url 'dashboard:email_settings' %}">Set up email →</a></div></div>{% endif %}
+{% if not es.imap_configured %}<div class="alert alert--info" style="margin-bottom:14px">{% icon "info" 18 %}<div>Inbound sync is off. Customer replies sent to your mailbox won't appear here until you enable IMAP. <a href="{% url 'dashboard:email_settings' %}#imap">Enable inbox sync →</a></div></div>{% elif es.last_sync_at %}<p class="muted small" style="margin:0 0 12px">Last sync {{ es.last_sync_at|timesince }} ago — {{ es.last_sync_message }}</p>{% endif %}
+<div class="tabs" style="margin-bottom:14px">
+  <a href="?tab=inbox" class="{% if tab == 'inbox' %}active{% endif %}">Received</a><a href="?tab=unread" class="{% if tab == 'unread' %}active{% endif %}">Unread <span class="n">{{ counts.unread }}</span></a><a href="?tab=all" class="{% if tab == 'all' %}active{% endif %}">All threads</a>
+  <a href="?tab=outbox" class="{% if tab == 'outbox' %}active{% endif %}">Outbox{% if counts.queued %} <span class="n">{{ counts.queued }}</span>{% endif %}</a><a href="?tab=failed" class="{% if tab == 'failed' %}active{% endif %}">Failed <span class="n">{{ counts.failed }}</span></a>
+</div>
+<div class="card card--flush">
+  <form class="toolbar" method="get"><input type="hidden" name="tab" value="{{ tab }}"><div class="grow"><input class="input" type="search" name="q" value="{{ q }}" placeholder="Search subject, sender or text…"></div>
+    {% if kind == 'messages' and tab == 'outbox' %}<select class="input" style="width:auto" name="status" onchange="this.form.submit()"><option value="">Any status</option>{% for k, l in status_choices %}<option value="{{ k }}" {% if request.GET.status == k %}selected{% endif %}>{{ l }}</option>{% endfor %}</select><select class="input" style="width:auto" name="kind" onchange="this.form.submit()"><option value="">Any type</option>{% for k, l in kinds %}<option value="{{ k }}" {% if request.GET.kind == k %}selected{% endif %}>{{ l }}</option>{% endfor %}</select>{% endif %}
+    <button class="btn btn-sm" type="submit">Search</button></form>
+  {% if page.object_list %}
+  {% if kind == 'threads' %}
+  <ul class="list" style="padding:0 6px">{% for t in page.object_list %}<li style="padding:14px 12px"><span class="avatar" style="width:36px;height:36px;font-size:12px">{{ t.participant|default:"?"|slice:":1"|upper }}</span><div class="grow"><a href="{% url 'dashboard:thread' t.pk %}"><b>{{ t.subject|truncatechars:80 }}</b>{% if t.has_unread %} <span class="badge b-brand">new</span>{% endif %}</a><div class="muted small ellipsis">{{ t.participant }}{% if t.lead %} · lead {{ t.lead.reference }}{% endif %} · {{ t.msg_count }} message{{ t.msg_count|pluralize }}</div></div><span class="muted small nowrap">{{ t.last_message_at|timesince }} ago</span></li>{% endfor %}</ul>
+  {% else %}
+  <div class="table-wrap"><table class="t table--stack"><thead><tr><th>Subject</th><th>To</th><th>Type</th><th>Status</th><th>When</th><th></th></tr></thead><tbody>{% for m in page.object_list %}<tr>
+    <td class="title" data-label="Subject"><a href="{% url 'dashboard:message' m.pk %}">{{ m.subject|truncatechars:70 }}</a></td><td data-label="To" class="small">{{ m.to_emails|join:", "|truncatechars:40 }}</td><td data-label="Type">{{ m.get_kind_display }}</td>
+    <td data-label="Status"><span class="badge {{ m.status|badge_class }}">{{ m.get_status_display }}</span>{% if m.attempts > 1 %} <span class="muted tiny">×{{ m.attempts }}</span>{% endif %}</td><td data-label="When" class="nowrap">{{ m.created_at|date:"d M, H:i" }}</td>
+    <td class="nolabel"><div class="row-actions"><a class="btn btn-sm" href="{% url 'dashboard:message' m.pk %}">Details</a></div></td></tr>{% endfor %}</tbody></table></div>
+  {% endif %}
+  {% include "dashboard/_pagination.html" %}
+  {% else %}<div class="empty">{% icon "mail" 36 %}<h3>Nothing here yet</h3><p>{% if tab == 'failed' %}No failed emails — delivery is healthy.{% else %}Messages will appear after leads reply or you send an email.{% endif %}</p></div>{% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,10 @@
+{% extends "dashboard/base.html" %}
+{% block content %}
+<div class="page-head"><div><h1>Invite a user</h1><p>They receive a single-use link valid for 7 days. Without "approve automatically" they still wait for approval after accepting.</p></div></div>
+<form method="post" class="card" style="max-width:620px">{% csrf_token %}{{ form.non_field_errors }}
+  <div class="field {% if form.email.errors %}has-error{% endif %}"><label class="lbl" for="{{ form.email.id_for_label }}">Email</label>{{ form.email }}{{ form.email.errors }}</div>
+  <div class="field"><label class="lbl" for="{{ form.role.id_for_label }}">Role</label>{{ form.role }}{{ form.role.errors }}</div>
+  <div class="field field--check">{{ form.pre_approved }}<div><label for="{{ form.pre_approved.id_for_label }}">{{ form.pre_approved.label }}</label></div></div>
+  <div class="actions"><button class="btn btn-primary" type="submit">Send invitation</button><a class="btn" href="{% url 'dashboard:users' %}">Cancel</a></div>
+</form>
+{% endblock %}

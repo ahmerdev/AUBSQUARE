@@ -1,0 +1,22 @@
+{% extends "dashboard/base.html" %}
+{% load dash %}
+{% block content %}
+<div class="page-head"><div><h1>Sales reports</h1><p>Real numbers from your own records. Ad spend appears only where your team has entered it on a campaign.</p></div>
+  <div class="actions"><div class="tabs">{% for v, l in ranges %}<a href="?range={{ v }}" class="{% if range == v %}active{% endif %}">{{ l }}</a>{% endfor %}</div></div></div>
+<div class="grid g2" style="margin-bottom:16px;align-items:start">
+  <section class="card"><div class="card__head"><h2>Sales funnel</h2></div><div class="funnel">{% for label, n, pct in funnel %}<div class="frow"><span>{{ label }}</span><div class="fbar"><i style="width:{{ pct }}%"></i></div><b>{{ n }}</b></div>{% endfor %}</div></section>
+  <section class="card"><div class="card__head"><h2>Speed to lead</h2></div>
+    {% if resp.n %}<div class="grid g2"><div class="stat"><div class="stat__label">Average first reply</div><div class="stat__value">{{ resp.avg }}<small style="font-size:16px"> min</small></div></div><div class="stat"><div class="stat__label">Within {{ resp.target }} min</div><div class="stat__value">{{ resp.within }}%</div></div></div>
+    <p class="muted small" style="margin-top:8px">Based on {{ resp.n }} lead{{ resp.n|pluralize }} that got a reply. {{ resp.pending }} new lead{{ resp.pending|pluralize }} still waiting.</p>
+    {% else %}<div class="empty small"><p>No replied leads in this period yet. {{ resp.pending }} waiting for a first reply.</p></div>{% endif %}</section>
+</div>
+<div class="grid g2" style="margin-bottom:16px;align-items:start">
+  <section class="card"><div class="card__head"><h2>Leads by source</h2></div>{% if by_source %}<table class="t"><thead><tr><th>Source</th><th>Leads</th><th>Won</th><th>Win rate</th></tr></thead><tbody>{% for r in by_source %}<tr><td>{{ r.label }}</td><td>{{ r.n }}</td><td>{{ r.won }}</td><td>{{ r.rate }}%</td></tr>{% endfor %}</tbody></table>{% else %}<div class="empty small"><p>No leads in this period.</p></div>{% endif %}</section>
+  <section class="card"><div class="card__head"><h2>Leads by type of work</h2></div>{% if by_cat %}<table class="t"><thead><tr><th>Type</th><th>Leads</th><th>Won</th><th>Win rate</th></tr></thead><tbody>{% for r in by_cat %}<tr><td>{{ r.label }}</td><td>{{ r.n }}</td><td>{{ r.won }}</td><td>{{ r.rate }}%</td></tr>{% endfor %}</tbody></table>{% else %}<div class="empty small"><p>No leads in this period.</p></div>{% endif %}</section>
+</div>
+<div class="grid g2" style="align-items:start">
+  <section class="card"><div class="card__head"><h2>Cost per lead by campaign</h2></div>{% if camp %}<table class="t"><thead><tr><th>Campaign</th><th>Spend</th><th>Leads</th><th>Won</th><th>Cost / lead</th></tr></thead><tbody>{% for r in camp %}<tr><td><a href="{% url 'dashboard:campaign_detail' r.c.pk %}">{{ r.c.name }}</a></td><td>{{ r.spend }}</td><td>{{ r.leads }}</td><td>{{ r.won }}</td><td>{% if r.cpl %}{{ r.cpl }}{% else %}—{% endif %}</td></tr>{% endfor %}</tbody></table><p class="muted small" style="margin-top:8px">Leads are matched by the campaign's UTM name. Spend is whatever was entered on the campaign – it is not read from Google or Meta.</p>{% else %}<div class="empty small"><p>No campaign with a UTM name has leads or recorded spend yet.</p></div>{% endif %}</section>
+  <section class="card"><div class="card__head"><h2>Proposals</h2></div><div class="grid g2"><div class="stat"><div class="stat__label">Sent</div><div class="stat__value">{{ prop.sent }}</div><div class="stat__foot">{{ prop.viewed }} opened</div></div><div class="stat"><div class="stat__label">Won</div><div class="stat__value">{{ prop.won }}</div><div class="stat__foot">{{ currency }} {{ prop.won_value }}</div></div></div>
+    <p class="muted small" style="margin-top:8px">{{ prop.requested }} waiting for you to confirm · {{ prop.declined }} declined/lost.</p></section>
+</div>
+{% endblock %}

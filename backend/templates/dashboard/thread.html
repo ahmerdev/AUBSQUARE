@@ -1,0 +1,21 @@
+{% extends "dashboard/base.html" %}
+{% load dash %}
+{% block content %}
+<div class="page-head"><div><h1>{{ t.subject|truncatechars:90 }}</h1><p>{{ t.participant }}{% if t.lead %} · <a href="{% url 'dashboard:lead_detail' t.lead_id %}">Lead {{ t.lead.reference }}</a>{% endif %}</p></div><div class="actions"><a class="btn" href="{% url 'dashboard:inbox' %}">← Inbox</a></div></div>
+{% for m in msgs %}
+<article class="mail mail--{{ m.direction }}">
+  <div class="mail__head"><div><b>{% if m.direction == 'in' %}{{ m.from_name|default:m.from_email }}{% else %}{{ m.created_by.display_name|default:"AUB SQUARE" }}{% endif %}</b> <span class="muted small">{% if m.direction == 'in' %}&lt;{{ m.from_email }}&gt;{% else %}to {{ m.to_emails|join:", " }}{% endif %}</span><div class="muted small">{{ m.subject }}</div></div>
+    <div class="right small"><span class="badge {{ m.status|badge_class }}">{{ m.get_status_display }}</span><div class="muted">{{ m.created_at|date:"d M Y, H:i" }}</div></div></div>
+  <div class="mail__body">{{ m.body_text|default:"(no text content)" }}</div>
+  {% if m.error %}<div class="alert alert--bad" style="margin:0 16px 14px">{{ m.error|truncatechars:240 }} <a href="{% url 'dashboard:message' m.pk %}">Retry →</a></div>{% endif %}
+</article>
+{% empty %}<div class="empty"><h3>No messages in this thread</h3></div>{% endfor %}
+{% if can_reply %}
+<section class="card" style="margin-top:16px"><div class="card__head"><h2>Reply</h2>{% if not es.smtp_configured %}<span class="badge b-warn">SMTP not configured</span>{% endif %}</div>
+  <form method="post" action="{% url 'dashboard:thread_reply' t.pk %}">{% csrf_token %}
+    <div class="fgrid"><div class="field"><label class="lbl" for="to">To</label><input class="input" id="to" type="email" name="to" value="{{ default_to }}" required></div><div class="field"><label class="lbl" for="sub">Subject</label><input class="input" id="sub" name="subject" value="{{ reply_subject }}" maxlength="250" required></div></div>
+    <div class="field"><textarea class="input" name="body" rows="8" required aria-label="Message"></textarea></div>
+    <button class="btn btn-primary" type="submit" {% if not es.smtp_configured %}disabled{% endif %}>{% icon "send" 16 %} Send reply</button>
+  </form></section>
+{% endif %}
+{% endblock %}

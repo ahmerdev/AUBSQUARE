@@ -1,0 +1,22 @@
+{% extends "dashboard/base.html" %}
+{% load dash %}
+{% block content %}
+<form method="post" novalidate>{% csrf_token %}
+<div class="page-head"><div><h1>{% if seq %}{{ seq.name }}{% else %}New sequence{% endif %}</h1><p>Step 1 goes out first. Later steps are drafted after the delay – only if the previous email was actually sent and the prospect has not replied.</p></div>
+  <div class="actions"><a class="btn" href="{% url 'dashboard:sequences' %}">Cancel</a>{% if seq %}<button class="btn btn-danger" form="delseq" data-confirm="Delete this sequence?" data-confirm-title="Delete sequence">Delete</button>{% endif %}<button class="btn btn-primary" type="submit">Save</button></div></div>
+<section class="card" style="margin-bottom:16px"><div class="fgrid">
+  <div class="field"><label class="lbl">Name</label><input class="input" name="name" value="{{ seq.name|default:'' }}{% if form_post %}{% endif %}" required></div>
+  <div class="field"><label class="lbl">Description</label><input class="input" name="description" value="{{ seq.description|default:'' }}"></div>
+  <div class="field field--check"><input class="check" type="checkbox" name="is_active" id="is_active" {% if not seq or seq.is_active %}checked{% endif %}><div class="field__text"><label for="is_active">Active</label></div></div></div></section>
+<section class="card"><div class="card__head"><h3>Steps (max 5)</h3><button class="btn btn-sm" type="button" id="addstep">{% icon "plus" 14 %} Add step</button></div>
+  <div id="steps">{% for st in steps %}<div class="fgrid stepbox"><div class="field"><label class="lbl">Wait (days)</label><input class="input" type="number" min="0" max="60" name="delay_days" value="{{ st.delay_days }}"></div>
+    <div class="field"><label class="lbl">Message template</label><select class="input" name="template"><option value="">Auto-write from audit findings</option>{% for t in templates %}<option value="{{ t.pk }}" {% if st.template_id == t.pk %}selected{% endif %}>{{ t.name }}</option>{% endfor %}</select></div>
+    <div class="field"><button class="btn btn-sm btn-danger" type="button" data-remove>Remove</button></div></div>{% endfor %}</div>
+  <template id="steptpl"><div class="fgrid stepbox"><div class="field"><label class="lbl">Wait (days)</label><input class="input" type="number" min="0" max="60" name="delay_days" value="3"></div>
+    <div class="field"><label class="lbl">Message template</label><select class="input" name="template"><option value="">Auto-write from audit findings</option>{% for t in templates %}<option value="{{ t.pk }}">{{ t.name }}</option>{% endfor %}</select></div>
+    <div class="field"><button class="btn btn-sm btn-danger" type="button" data-remove>Remove</button></div></div></template>
+</section></form>
+{% if seq %}<form id="delseq" method="post" action="{% url 'dashboard:sequence_delete' seq.pk %}">{% csrf_token %}</form>{% endif %}
+<script>(function(){var box=document.getElementById("steps"),tpl=document.getElementById("steptpl");function add(){if(box.children.length>=5)return;box.appendChild(tpl.content.cloneNode(true));}
+document.getElementById("addstep").addEventListener("click",add);box.addEventListener("click",function(e){var b=e.target.closest("[data-remove]");if(b)b.closest(".stepbox").remove();});if(!box.children.length)add();})();</script>
+{% endblock %}

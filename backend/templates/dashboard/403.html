@@ -1,0 +1,5 @@
+{% extends "dashboard/base.html" %}
+{% load dash %}
+{% block content %}
+<div class="empty" style="margin-top:60px">{% icon "lock" 44 %}<h3>Access denied</h3><p>{{ message }}</p><a class="btn btn-primary" href="{% url 'dashboard:home' %}">Back to dashboard</a></div>
+{% endblock %}

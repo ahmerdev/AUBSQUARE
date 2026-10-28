@@ -1,0 +1,13 @@
+{% extends "dashboard/base.html" %}
+{% load dash %}
+{% block content %}
+<form method="post" data-warn-unsaved>{% csrf_token %}
+<div class="page-head"><div><h1>{{ role.name|default:"New role" }}</h1><p>Tick the actions this role may perform in each section. Super Admins always have full access.</p></div>
+  <div class="actions"><a class="btn" href="{% url 'dashboard:roles' %}">← Roles</a>{% if role.pk and not role.is_system %}<button class="btn btn-danger" type="submit" formaction="{% url 'dashboard:role_delete' role.pk %}" data-confirm="Delete this role? Users must be moved off it first." data-confirm-title="Delete role" data-keep>{% icon "trash" 16 %} Delete</button>{% endif %}</div></div>
+<div class="card" style="margin-bottom:16px"><div class="fgrid"><div class="field"><label class="lbl" for="rn">Role name</label><input class="input" id="rn" name="name" value="{{ role.name }}" maxlength="60" required></div><div class="field"><label class="lbl" for="rd">Description</label><input class="input" id="rd" name="description" value="{{ role.description }}" maxlength="200"></div></div></div>
+<div class="card card--flush"><div class="table-wrap"><table class="matrix"><thead><tr><th>Section</th>{% for a, l in actions %}<th><button type="button" class="btn btn-sm btn-ghost" data-col-all="{{ a }}" title="Toggle column">{{ l }}</button></th>{% endfor %}<th></th></tr></thead><tbody>
+{% for row in matrix %}<tr><td><b>{{ row.label }}</b></td>{% for a, l, on in row.actions %}<td><input class="check" type="checkbox" data-act="{{ a }}" name="p-{{ row.key }}-{{ a }}" value="1" {% if on %}checked{% endif %} aria-label="{{ row.label }} – {{ l }}"></td>{% endfor %}<td><button type="button" class="btn btn-sm btn-ghost" data-row-all>All</button></td></tr>{% endfor %}
+</tbody></table></div></div>
+<div class="sticky-save"><button class="btn btn-primary" type="submit">{% icon "check" 16 %} Save role</button><span class="muted small">Changes apply on the next request for every user with this role.</span></div>
+</form>
+{% endblock %}

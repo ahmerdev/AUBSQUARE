@@ -1,0 +1,200 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --bg-primary: #0B0B12;
+    --bg-secondary: #120D24;
+    --card-bg: #191430;
+    --border-color: #2E2748;
+    --magenta: #EC008C;
+    --purple: #7B2FFF;
+    --violet: #9333EA;
+  }
+
+  html {
+    overflow-x: clip;
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+  }
+
+  /* Lenis recommended base styles (smooth scroll must not fight native smooth-scroll). */
+  html.lenis, html.lenis body { height: auto; }
+  .lenis.lenis-smooth { scroll-behavior: auto !important; }
+  .lenis.lenis-smooth [data-lenis-prevent] { overscroll-behavior: contain; }
+  .lenis.lenis-stopped { overflow: clip; }
+  .lenis.lenis-scrolling iframe { pointer-events: none; }
+
+  body {
+    font-family: var(--font-body, 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif);
+    background-color: #0B0B12;
+    color: #FFFFFF;
+    overflow-x: clip;
+    min-height: 100vh;
+    min-height: 100dvh;
+  }
+
+  /* Scroll lock used by menus / modals (works together with Lenis.stop()). */
+  body.scroll-locked {
+    overflow: hidden;
+    padding-right: var(--scrollbar-comp, 0px);
+  }
+
+  /* Visible, brand-coloured keyboard focus everywhere. */
+  :focus-visible {
+    outline: 2px solid #EC008C;
+    outline-offset: 3px;
+    border-radius: 6px;
+  }
+  :focus:not(:focus-visible) { outline: none; }
+
+  img { max-width: 100%; height: auto; }
+  img, video, svg, canvas { display: block; }
+  p, h1, h2, h3, h4, li { overflow-wrap: break-word; }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-heading, 'Outfit', sans-serif);
+  }
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-track {
+  background: #0B0B12;
+}
+::-webkit-scrollbar-thumb {
+  background: #2E2748;
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #7B2FFF;
+}
+
+/* Glassmorphism utilities */
+.glass-panel {
+  background: rgba(25, 20, 48, 0.7);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(46, 39, 72, 0.75);
+}
+
+.glass-panel-subtle {
+  background: rgba(18, 13, 36, 0.55);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(46, 39, 72, 0.5);
+}
+
+.glass-header {
+  background: rgba(11, 11, 18, 0.85);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(46, 39, 72, 0.7);
+}
+
+/* Gradient text */
+.text-gradient {
+  background: linear-gradient(92deg, #EC008C 10%, #7B2FFF 90%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.text-gradient-purple {
+  background: linear-gradient(135deg, #C99BFF 0%, #7B2FFF 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* Ambient lighting */
+.ambient-glow-magenta {
+  background: radial-gradient(circle, rgba(236, 0, 140, 0.15) 0%, transparent 70%);
+}
+
+.ambient-glow-purple {
+  background: radial-gradient(circle, rgba(123, 47, 255, 0.18) 0%, transparent 70%);
+}
+
+/* Safe area bottom padding for iPhone */
+.safe-area-bottom {
+  padding-bottom: max(1.5rem, env(safe-area-inset-bottom));
+}
+
+/* Hide scrollbars utilities */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+
+/* ------------------------------------------------------------------ */
+/* Fluid typography — scales smoothly 320px → 1920px                    */
+/* ------------------------------------------------------------------ */
+.fluid-hero    { font-size: clamp(2.05rem, 1.2rem + 3.3vw, 4rem); line-height: 1.06; letter-spacing: -0.02em; }
+.fluid-h1      { font-size: clamp(1.9rem, 1.1rem + 3.2vw, 3.75rem); line-height: 1.1; letter-spacing: -0.02em; }
+.fluid-h2      { font-size: clamp(1.75rem, 1.2rem + 2.6vw, 3.25rem); line-height: 1.12; letter-spacing: -0.015em; }
+.fluid-lead    { font-size: clamp(0.98rem, 0.9rem + 0.4vw, 1.2rem); line-height: 1.65; }
+.section-y     { padding-block: clamp(2.75rem, 2rem + 4vw, 6rem); }
+.container-x   { padding-inline: max(1rem, env(safe-area-inset-left)) max(1rem, env(safe-area-inset-right)); }
+
+/* Touch-target helper (WCAG 2.2 AA: 24px min, we aim for 44px) */
+.tap-44 { min-width: 44px; min-height: 44px; }
+
+/* Shared card sheen / glints */
+.sheen { position: relative; isolation: isolate; }
+.sheen::after {
+  content: '';
+  position: absolute; inset: 0; border-radius: inherit; pointer-events: none;
+  background: linear-gradient(115deg, transparent 35%, rgba(255,255,255,0.07) 48%, transparent 60%);
+  transform: translateX(-120%);
+  transition: transform 0.9s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.sheen:hover::after { transform: translateX(120%); }
+
+/* Hero headline word reveal */
+.word-mask { display: inline-block; overflow: hidden; vertical-align: top; padding-bottom: 0.12em; margin-bottom: -0.12em; }
+.word-mask > span { display: inline-block; will-change: transform; }
+
+/* 3D scene shells: GPU hints without forcing layers on every section */
+.scene-layer { contain: strict; will-change: auto; }
+
+/* Hover-only interactions must have a touch/keyboard path. */
+@media (hover: none) {
+  .hover-only-hide { opacity: 1 !important; transform: none !important; }
+}
+
+/* Reduced motion: remove non-essential movement everywhere. */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+  .sheen::after { display: none; }
+}
+
+/* Prevent native image ghost-dragging from fighting carousel drags */
+img { -webkit-user-drag: none; }
+
+/* ---- CMS rich text (blog bodies, service/about story). Content is sanitised server-side before it is stored. ---- */
+.cms-prose { color: #B8B3D1; font-size: 1rem; line-height: 1.8; overflow-wrap: anywhere; }
+.cms-prose > * + * { margin-top: 1.1em; }
+.cms-prose h2 { color: #fff; font-family: inherit; font-weight: 700; font-size: 1.6rem; line-height: 1.25; margin-top: 2em; scroll-margin-top: 7rem; }
+.cms-prose h3 { color: #fff; font-weight: 700; font-size: 1.25rem; margin-top: 1.6em; scroll-margin-top: 7rem; }
+.cms-prose a { color: #EC008C; text-decoration: underline; text-underline-offset: 3px; }
+.cms-prose strong { color: #fff; }
+.cms-prose ul, .cms-prose ol { padding-left: 1.4em; }
+.cms-prose ul { list-style: disc; } .cms-prose ol { list-style: decimal; }
+.cms-prose li + li { margin-top: .35em; }
+.cms-prose blockquote { border-left: 4px solid #EC008C; background: rgba(25,20,48,.8); padding: 1rem 1.25rem; border-radius: 0 1rem 1rem 0; color: #fff; font-style: italic; }
+.cms-prose img { max-width: 100%; height: auto; border-radius: 1rem; border: 1px solid rgba(255,255,255,.1); }
+.cms-prose pre, .cms-prose code { background: rgba(25,20,48,.9); border-radius: .5rem; font-size: .9em; }
+.cms-prose code { padding: .1em .4em; } .cms-prose pre { padding: 1rem; overflow-x: auto; }
+.cms-prose table { display: block; overflow-x: auto; border-collapse: collapse; }
+.cms-prose th, .cms-prose td { border: 1px solid rgba(255,255,255,.12); padding: .5rem .75rem; }
